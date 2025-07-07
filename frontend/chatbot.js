@@ -1,6 +1,6 @@
 // === KHÔNG CÒN API KEY Ở ĐÂY ===
 // URL của backend server
-const BACKEND_URL = 'http://localhost:3000';
+const BACKEND_URL = 'https://my-ai-chatbot-utz9.onrender.com';
 
 // Biến toàn cục cho Speech-to-Text
 let mediaRecorder;
