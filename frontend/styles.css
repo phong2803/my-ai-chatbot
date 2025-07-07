@@ -120,3 +120,32 @@ h1 {
 .chat-input button.recording {
     color: #ff0055; /* Change color to indicate recording */
 }
+
+/* --- Styles for the 'Read' button (Nút Đọc) --- */
+.read-button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff; /* Màu xanh */
+    color: white;
+    cursor: pointer;
+    font-size: 0.8em;
+    vertical-align: middle;
+    transition: background-color 0.2s ease;
+}
+
+.read-button:hover {
+    background-color: #0056b3;
+}
+
+/* Tùy chọn: Điều chỉnh khoảng cách nếu cần */
+.chat-message.bot-message {
+    display: flex; /* Dùng flexbox để căn chỉnh văn bản và nút */
+    align-items: center; /* Căn giữa các mục theo chiều dọc */
+    flex-wrap: wrap; /* Cho phép xuống dòng trên màn hình nhỏ */
+}
+
+.chat-message.bot-message p {
+    margin-right: auto; /* Đẩy nút sang phải */
+}

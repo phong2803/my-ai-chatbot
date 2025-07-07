@@ -83,27 +83,49 @@ async function startSpeechToText() {
     }
 }
 
+// --- HÀM MỚI ĐỂ HIỂN THỊ TIN NHẮN (MESSAGE APPENDER) ---
+function appendMessage(sender, text) {
+    const chatWindow = document.getElementById('chat-window');
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('chat-message', `${sender}-message`);
+
+    const textContent = document.createElement('p');
+    textContent.textContent = text;
+    messageDiv.appendChild(textContent);
+
+    // Thêm nút 'Đọc' chỉ cho tin nhắn của bot
+    if (sender === 'bot') {
+        const readButton = document.createElement('button');
+        readButton.textContent = '🔊 Đọc'; // Biểu tượng loa và chữ "Đọc"
+        readButton.classList.add('read-button'); // Thêm class để CSS
+        readButton.onclick = () => speakText(text); // Gán sự kiện click để gọi speakText
+
+        messageDiv.appendChild(readButton);
+    }
+
+    chatWindow.appendChild(messageDiv);
+    chatWindow.scrollTop = chatWindow.scrollHeight; // Cuộn xuống cuối
+}
+
+
 // Hàm gửi tin nhắn (gọi đến backend)
 async function sendMessage() {
     const messageInput = document.getElementById('message');
     const message = messageInput.value;
-    const chatWindow = document.getElementById('chat-window');
+    // const chatWindow = document.getElementById('chat-window'); // Không cần tham chiếu trực tiếp đến chatWindow ở đây nữa
     if (message.trim() === '') return;
 
-    // Hiển thị tin nhắn người dùng
-    const userMessageDiv = document.createElement('div');
-    userMessageDiv.classList.add('chat-message', 'user-message');
-    userMessageDiv.innerText = message;
-    chatWindow.appendChild(userMessageDiv);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+    // Hiển thị tin nhắn người dùng (sử dụng hàm appendMessage mới)
+    appendMessage('user', message);
     messageInput.value = '';
 
     // Hiển thị placeholder cho tin nhắn bot
-    const botMessageDiv = document.createElement('div');
-    botMessageDiv.classList.add('chat-message', 'bot-message');
-    botMessageDiv.innerText = '...'; // Dấu hiệu bot đang "suy nghĩ"
-    chatWindow.appendChild(botMessageDiv);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+    // Lưu tham chiếu đến div này để cập nhật sau
+    const botMessagePlaceholderDiv = document.createElement('div');
+    botMessagePlaceholderDiv.classList.add('chat-message', 'bot-message');
+    botMessagePlaceholderDiv.innerText = '...'; // Dấu hiệu bot đang "suy nghĩ"
+    document.getElementById('chat-window').appendChild(botMessagePlaceholderDiv);
+    document.getElementById('chat-window').scrollTop = document.getElementById('chat-window').scrollHeight;
 
     try {
         // Gửi tin nhắn đến backend
@@ -116,13 +138,14 @@ async function sendMessage() {
         const data = await response.json();
         const botMessage = data.botMessage;
 
-        // Cập nhật tin nhắn của bot và phát âm thanh
-        botMessageDiv.innerText = botMessage;
-        speakText(botMessage);
+        // Xóa placeholder và hiển thị tin nhắn thật của bot
+        botMessagePlaceholderDiv.remove(); // Xóa placeholder
+        appendMessage('bot', botMessage); // Hiển thị tin nhắn thực tế của bot với nút
 
     } catch (error) {
-        console.error('Error sending message:', error);
-        botMessageDiv.innerText = 'Sorry, an error occurred.';
+        console.error('Lỗi khi gửi tin nhắn:', error);
+        // Nếu xảy ra lỗi, cập nhật placeholder bằng thông báo lỗi
+        botMessagePlaceholderDiv.innerText = 'Xin lỗi, đã xảy ra lỗi.';
     }
 }
 
