@@ -130,7 +130,7 @@ app.post('/tts', async (req, res) => {
             console.log('FPT.AI returned an async link, fetching final audio from:', asyncUrl);
 
             // Chờ một khoảng thời gian ngắn để FPT.AI xử lý (ví dụ: 2 giây)
-            await new Promise(resolve => setTimeout(resolve, 2000)); 
+            await new Promise(resolve => setTimeout(resolve, 4000)); 
 
             // Fetch lại link async để lấy file MP3 thực sự
             const finalAudioResponse = await fetch(asyncUrl);
