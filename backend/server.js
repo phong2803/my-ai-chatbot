@@ -68,8 +68,8 @@ app.post('/chat', async (req, res) => {
         console.log('Chatbase parsed data (success):', data); 
         
         // Kiểm tra xem data.content có tồn tại và hợp lệ không
-        if (data && data.content) {
-            res.json({ botMessage: data.content });
+        if (data && data.text) {
+            res.json({ botMessage: data.text });
         } else {
             // Log 6: Phản hồi từ Chatbase không có nội dung bot mong muốn
             console.error('Chatbase response missing expected content or is empty:', data); 
