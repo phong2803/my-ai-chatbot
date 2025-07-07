@@ -109,6 +109,8 @@ app.post('/stt', upload.single('audio'), async (req, res) => {
 app.post('/tts', async (req, res) => {
     try {
         const text = req.body.text;
+        console.log('Received TTS request for text:', text); // Log để kiểm tra
+
         const fptResponse = await fetch('https://api.fpt.ai/hmi/tts/v5', {
             method: 'POST',
             headers: {
@@ -119,12 +121,44 @@ app.post('/tts', async (req, res) => {
             body: JSON.stringify({ 'text': text })
         });
 
-        const data = await fptResponse.json();
-        res.json(data); // Gửi link audio về cho frontend
+        const initialFptData = await fptResponse.json();
+        console.log('Initial FPT.AI TTS response:', initialFptData); // Log phản hồi ban đầu
+
+        // Kiểm tra xem có phải là async link không
+        if (initialFptData && initialFptData.async) {
+            const asyncUrl = initialFptData.async;
+            console.log('FPT.AI returned an async link, fetching final audio from:', asyncUrl);
+
+            // Chờ một khoảng thời gian ngắn để FPT.AI xử lý (ví dụ: 2 giây)
+            await new Promise(resolve => setTimeout(resolve, 2000)); 
+
+            // Fetch lại link async để lấy file MP3 thực sự
+            const finalAudioResponse = await fetch(asyncUrl);
+
+            if (finalAudioResponse.ok) {
+                // FPT.AI API trả về file audio trực tiếp
+                // Bạn có thể trả về URL hoặc stream trực tiếp file audio
+                const finalAudioUrl = finalAudioResponse.url; // Lấy URL cuối cùng sau redirect
+                console.log('Final audio URL obtained:', finalAudioUrl);
+                res.json({ audioUrl: finalAudioUrl }); // Trả về chỉ URL MP3 cho frontend
+            } else {
+                const errorBody = await finalAudioResponse.text();
+                console.error('Failed to fetch final audio from async link. Status:', finalAudioResponse.status, 'Body:', errorBody);
+                return res.status(500).json({ error: 'Failed to fetch final audio from FPT.AI async link', details: errorBody });
+            }
+
+        } else if (initialFptData && initialFptData.data && initialFptData.data.url) {
+            // Trường hợp FPT.AI trả về link trực tiếp (ít phổ biến với API v5 async)
+            console.log('FPT.AI returned direct audio URL:', initialFptData.data.url);
+            res.json({ audioUrl: initialFptData.data.url }); // Trả về chỉ URL MP3 cho frontend
+        } else {
+            console.error('FPT.AI TTS response invalid or missing expected URL:', initialFptData);
+            res.status(500).json({ error: 'FPT.AI TTS response invalid', details: initialFptData });
+        }
 
     } catch (error) {
         console.error('Error in /tts endpoint:', error);
-        res.status(500).json({ error: 'Failed to synthesize speech' });
+        res.status(500).json({ error: 'Failed to synthesize speech', details: error.message });
     }
 });
 

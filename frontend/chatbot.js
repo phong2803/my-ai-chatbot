@@ -16,15 +16,20 @@ async function speakText(text) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: text })
         });
-        const data = await response.json();
-        if (data.async) {
-            const audio = new Audio(data.async);
-            audio.play();
+        const data = await response.json(); // Backend giờ sẽ trả về { audioUrl: "link_mp3_thực_sự" }
+
+        // Kiểm tra xem backend có trả về audioUrl hợp lệ không
+        if (data && data.audioUrl) {
+            const audio = new Audio(data.audioUrl); // Sử dụng link MP3 trực tiếp từ backend
+            audio.play().catch(e => {
+                console.error("Lỗi khi phát âm thanh từ URL:", data.audioUrl, e);
+                // Bạn có thể thêm thông báo lỗi cho người dùng ở đây nếu muốn
+            });
         } else {
-            console.error('TTS did not return a valid URL:', data);
+            console.error('Backend TTS did not return a valid audioUrl:', data);
         }
     } catch (error) {
-        console.error('Error with Text-to-Speech:', error);
+        console.error('Lỗi với Text-to-Speech:', error);
     }
 }
 
