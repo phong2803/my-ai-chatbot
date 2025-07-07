@@ -1,9 +1,9 @@
 // Nạp các thư viện cần thiết
 require('dotenv').config(); // Để đọc file .env
 const express = require('express');
-const cors = require('cors');
+const cors = require('cors'); // Đảm bảo gói 'cors' đã được cài đặt: npm install cors
 const multer = require('multer');
-const fetch = require('node-fetch');
+const fetch = require('node-fetch'); // node-fetch là cần thiết cho các cuộc gọi fetch trong Node.js
 
 // Lấy API keys từ file .env một cách an toàn
 const FPT_API_KEY = process.env.FPT_API_KEY;
@@ -11,32 +11,58 @@ const CHATBASE_API_KEY = process.env.CHATBASE_API_KEY;
 
 // Khởi tạo Express app
 const app = express();
-const port = 3000; // Backend sẽ chạy ở cổng 3000
+// Render sẽ cung cấp cổng qua biến môi trường PORT, KHÔNG phải cứng mã 3000
+const port = process.env.PORT || 3000; 
 
-// Cấu hình
-app.use(cors()); // Cho phép cross-origin requests
-app.use(express.json()); // Cho phép đọc JSON từ body của request
-const upload = multer({ storage: multer.memoryStorage() }); // Cấu hình để nhận file trong bộ nhớ
+// Cấu hình Multer cho việc xử lý file
+// Dùng memoryStorage để lưu file vào bộ nhớ, phù hợp cho các file nhỏ
+const upload = multer({ storage: multer.memoryStorage() }); 
+
+// --- CẤU HÌNH CORS (PHẢI NẰM Ở ĐÂY VÀ TRƯỚC TẤT CẢ CÁC MIDDLEWARE KHÁC VÀ ROUTES) ---
+// Định nghĩa các nguồn (origins) được phép truy cập backend của bạn
+const allowedOrigins = [
+    'https://thuoc-quanh-nha.netlify.app', // Tên miền chính thức của frontend bạn trên Netlify
+    'http://localhost:3000',             // Nếu bạn đang chạy frontend cục bộ trên cổng 3000
+    'http://localhost:8080'              // Nếu bạn đang chạy frontend cục bộ trên cổng 8080 (hoặc cổng nào đó bạn đang dùng)
+];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Cho phép các yêu cầu không có origin (ví dụ: từ Postman, cURL, hoặc server-to-server)
+        if (!origin) return callback(null, true); 
+        // Kiểm tra xem origin của yêu cầu có nằm trong danh sách được phép không
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = `The CORS policy for this site does not allow access from the specified Origin: ${origin}`;
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Các phương thức HTTP được phép
+    credentials: true, // Cho phép gửi cookies, authorization headers, v.v. (quan trọng cho xác thực)
+    optionsSuccessStatus: 204 // Trả về mã trạng thái 204 cho yêu cầu preflight thành công
+}));
+// --- KẾT THÚC CẤU HÌNH CORS ---
+
+// Cho phép đọc JSON từ body của request (PHẢI NẰM SAU CORS, TRƯỚC CÁC ROUTES)
+app.use(express.json()); 
+
 
 // --- CÁC ĐƯỜNG DẪN (API ENDPOINTS) ---
 
-app.post('/chat', async (req, res) => {
+app.post('/chat', upload.none(), async (req, res) => { 
     try {
         const userMessage = req.body.message;
-        // Log 1: Xác nhận yêu cầu từ frontend đã đến đây
         console.log('Received message from frontend:', userMessage); 
 
-        // Log API Key và Chatbot ID để đảm bảo chúng được load và sử dụng
         console.log('CHATBASE_API_KEY (loaded):', CHATBASE_API_KEY ? 'Yes' : 'No'); 
         console.log('Chatbot ID (in code):', 'fQ9R8KFVCa2pnpWp82_yU'); 
 
         const chatbaseRequestPayload = {
             messages: [{ content: userMessage, role: 'user' }],
-            chatbotId: 'fQ9R8KFVCa2pnpWp82_yU', // Đảm bảo ID này chính xác
+            chatbotId: 'fQ9R8KFVCa2pnpWp82_yU', 
             stream: false,
             model: 'gpt-4o',
         };
-        // Log 2: Payload (dữ liệu) sẽ gửi tới Chatbase
         console.log('Sending payload to Chatbase:', JSON.stringify(chatbaseRequestPayload)); 
 
         const response = await fetch('https://www.chatbase.co/api/v1/chat', {
@@ -48,15 +74,11 @@ app.post('/chat', async (req, res) => {
             body: JSON.stringify(chatbaseRequestPayload),
         });
 
-        // Log 3: Trạng thái HTTP nhận được từ Chatbase API
         console.log('Received raw response from Chatbase. HTTP Status:', response.status); 
 
-        // Kiểm tra nếu phản hồi từ Chatbase không thành công (ví dụ: 401, 403, 429, 500)
         if (!response.ok) {
             const errorText = await response.text();
-            // Log 4: Lỗi chi tiết từ Chatbase API
             console.error('Chatbase API returned an error (response.ok is false):', response.status, errorText); 
-            // Trả về lỗi chi tiết hơn cho frontend để tiện debug
             return res.status(response.status).json({ 
                 error: `Chatbase API error: ${response.status}`, 
                 details: errorText 
@@ -64,26 +86,25 @@ app.post('/chat', async (req, res) => {
         }
 
         const data = await response.json();
-        // Log 5: Dữ liệu JSON đã parse được từ Chatbase (khi thành công)
         console.log('Chatbase parsed data (success):', data); 
-        
-        // Kiểm tra xem data.content có tồn tại và hợp lệ không
-        if (data && data.text) {
-            res.json({ botMessage: data.text });
+
+        // SỬA ĐỊNH DẠNG PHẢN HỒI CHO FRONTEND TẠI ĐÂY
+        // Frontend mong đợi một trường tên là 'botMessage', không phải 'text'
+        if (data && data.text) { 
+            res.json({ botMessage: data.text }); // Đổi 'text' thành 'botMessage'
         } else {
-            // Log 6: Phản hồi từ Chatbase không có nội dung bot mong muốn
             console.error('Chatbase response missing expected content or is empty:', data); 
             res.status(500).json({ error: 'Chatbase response valid but missing bot content', details: data });
         }
 
     } catch (error) {
-        // Log 7: Bất kỳ lỗi nào không mong muốn xảy ra trong quá trình thực thi
         console.error('CRITICAL ERROR in /chat endpoint (caught by try/catch):', error.message, error.stack); 
         res.status(500).json({ error: 'Failed to get response from Chatbase due to an unexpected server error.' });
     }
 });
+
 // 2. Endpoint cho Speech-to-Text (FPT.AI)
-app.post('/stt', upload.single('audio'), async (req, res) => {
+app.post('/stt', upload.single('audio'), async (req, res) => { // Dùng upload.single('audio') để xử lý file audio
     if (!req.file) {
         return res.status(400).json({ error: 'No audio file uploaded.' });
     }
@@ -97,7 +118,7 @@ app.post('/stt', upload.single('audio'), async (req, res) => {
         });
 
         const data = await fptResponse.json();
-        res.json(data); // Gửi kết quả nhận dạng về frontend
+        res.json(data); 
 
     } catch (error) {
         console.error('Error in /stt endpoint:', error);
@@ -109,38 +130,34 @@ app.post('/stt', upload.single('audio'), async (req, res) => {
 app.post('/tts', async (req, res) => {
     try {
         const text = req.body.text;
-        console.log('Received TTS request for text:', text); // Log để kiểm tra
+        console.log('Received TTS request for text:', text); 
 
         const fptResponse = await fetch('https://api.fpt.ai/hmi/tts/v5', {
             method: 'POST',
             headers: {
                 'api-key': FPT_API_KEY,
                 'Content-Type': 'application/json',
-                'voice': 'banmai'
+                'voice': 'banmai' // Bạn có thể thay đổi giọng nói nếu muốn
             },
             body: JSON.stringify({ 'text': text })
         });
 
         const initialFptData = await fptResponse.json();
-        console.log('Initial FPT.AI TTS response:', initialFptData); // Log phản hồi ban đầu
+        console.log('Initial FPT.AI TTS response:', initialFptData); 
 
-        // Kiểm tra xem có phải là async link không
         if (initialFptData && initialFptData.async) {
             const asyncUrl = initialFptData.async;
             console.log('FPT.AI returned an async link, fetching final audio from:', asyncUrl);
 
-            // Chờ một khoảng thời gian ngắn để FPT.AI xử lý (ví dụ: 2 giây)
-            await new Promise(resolve => setTimeout(resolve, 4000)); 
+            // Tăng thời gian chờ lên 8 giây. FPT.AI cần thời gian để xử lý audio.
+            await new Promise(resolve => setTimeout(resolve, 8000)); // Thử 8 giây để đảm bảo đủ thời gian
 
-            // Fetch lại link async để lấy file MP3 thực sự
             const finalAudioResponse = await fetch(asyncUrl);
 
             if (finalAudioResponse.ok) {
-                // FPT.AI API trả về file audio trực tiếp
-                // Bạn có thể trả về URL hoặc stream trực tiếp file audio
-                const finalAudioUrl = finalAudioResponse.url; // Lấy URL cuối cùng sau redirect
+                const finalAudioUrl = finalAudioResponse.url; 
                 console.log('Final audio URL obtained:', finalAudioUrl);
-                res.json({ audioUrl: finalAudioUrl }); // Trả về chỉ URL MP3 cho frontend
+                res.json({ audioUrl: finalAudioUrl }); // Trả về URL MP3 cho frontend
             } else {
                 const errorBody = await finalAudioResponse.text();
                 console.error('Failed to fetch final audio from async link. Status:', finalAudioResponse.status, 'Body:', errorBody);
@@ -148,9 +165,8 @@ app.post('/tts', async (req, res) => {
             }
 
         } else if (initialFptData && initialFptData.data && initialFptData.data.url) {
-            // Trường hợp FPT.AI trả về link trực tiếp (ít phổ biến với API v5 async)
             console.log('FPT.AI returned direct audio URL:', initialFptData.data.url);
-            res.json({ audioUrl: initialFptData.data.url }); // Trả về chỉ URL MP3 cho frontend
+            res.json({ audioUrl: initialFptData.data.url }); 
         } else {
             console.error('FPT.AI TTS response invalid or missing expected URL:', initialFptData);
             res.status(500).json({ error: 'FPT.AI TTS response invalid', details: initialFptData });
@@ -164,6 +180,7 @@ app.post('/tts', async (req, res) => {
 
 
 // Khởi động server
+// Server sẽ lắng nghe trên cổng được cung cấp bởi Render (process.env.PORT)
 app.listen(port, () => {
     console.log(`✅ Backend server listening at http://localhost:${port}`);
 });
