@@ -1,7 +1,7 @@
 /* General styles */
 html, body {
     font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
+    background-color: #F5DEB3; /* Nền trang màu nâu nhạt */
     margin: 0;
     padding: 0;
     height: 100%; /* Chiếm toàn bộ chiều cao màn hình */
@@ -18,7 +18,7 @@ html, body {
     height: 95%; /* Chiếm 95% chiều cao màn hình */
     max-width: 800px; /* Giới hạn chiều rộng tối đa để không quá lớn trên màn hình rộng */
     max-height: 900px; /* Giới hạn chiều cao tối đa */
-    background: white;
+    background: white; /* Giữ nền trắng cho container chính */
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Shadow nổi bật hơn */
     overflow: hidden;
@@ -28,13 +28,13 @@ html, body {
 
 /* Chatbot header styling */
 h1 {
-    background: #a04bd1; /* Màu tím */
+    background: #A0522D; /* Màu nâu Sienna cho header */
     color: white;
     padding: 15px; /* Tăng padding */
     text-align: center;
     margin: 0;
     font-size: 1.8em; /* Tăng kích thước chữ */
-    border-bottom: 1px solid #8e3cb9; /* Thêm đường viền dưới */
+    border-bottom: 1px solid #8B4513; /* Đường viền dưới nâu đậm hơn */
 }
 
 /* Chat window styling */
@@ -42,10 +42,9 @@ h1 {
     padding: 15px; /* Tăng padding */
     flex-grow: 1;
     overflow-y: auto;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #eee; /* Giữ đường viền nhạt */
     display: flex;
     flex-direction: column;
-    /* max-height: 400px; Bỏ fixed height, giờ nó sẽ tự co giãn theo container */
 }
 
 /* Message bubble styling */
@@ -61,15 +60,16 @@ h1 {
 
 /* Bot message styling */
 .bot-message {
-    background: #f0f0f0;
+    background: #CD853F; /* Màu nâu Peru cho tin nhắn của bot */
+    color: white; /* Đổi màu chữ sang trắng để dễ đọc trên nền nâu */
     align-self: flex-start;
     border-radius: 20px 20px 20px 5px; /* Bo tròn góc dưới trái ít hơn */
 }
 
 /* User message styling */
 .user-message {
-    background: #a04bd1; /* Màu tím */
-    color: white;
+    background: #8B4513; /* Màu nâu SaddleBrown cho tin nhắn của người dùng */
+    color: white; /* Giữ màu chữ trắng */
     align-self: flex-end;
     border-radius: 20px 20px 5px 20px; /* Bo tròn góc dưới phải ít hơn */
 }
@@ -102,20 +102,20 @@ h1 {
 
 /* Unified button styling for mic, speaker, and send */
 .chat-input button {
-    background: none; 
+    background: none;
     border: none;
     cursor: pointer;
     padding: 10px;
-    color: #a04bd1; /* Màu tím cho icon */
+    color: #A0522D; /* Màu nâu Sienna cho icon */
     font-size: 1.4em; /* Tăng kích thước icon */
-    display: flex; 
+    display: flex;
     align-items: center;
     justify-content: center;
     transition: color 0.3s ease, transform 0.2s ease; /* Thêm hiệu ứng transform */
 }
 
 .chat-input button:hover {
-    color: #ff00c3; /* Màu hồng khi hover */
+    color: #D2691E; /* Màu nâu Chocolate khi hover */
     transform: translateY(-2px); /* Nhấc nhẹ nút lên khi hover */
 }
 
@@ -125,17 +125,17 @@ h1 {
 
 /* Specific styling for mic button */
 .chat-input button#mic-button {
-    margin-right: 5px; 
+    margin-right: 5px;
 }
 
 /* Specific styling for speaker button */
 .chat-input button#speaker-button {
-    margin-right: 5px; 
+    margin-right: 5px;
 }
 
 /* Style for when recording is active (mic button) */
 .chat-input button#mic-button.recording {
-    color: #ff0055; /* Màu đỏ để chỉ trạng thái ghi âm */
+    color: #B22222; /* Màu đỏ BrickRed để chỉ trạng thái ghi âm */
     animation: pulse-mic 1s infinite alternate; /* Hiệu ứng nhấp nháy */
 }
 
@@ -152,7 +152,7 @@ h1 {
 
 /* Style for when speaking is active (speaker button) */
 #speaker-button.speaking {
-    color: #28a745; /* Màu xanh lá khi đang nói */
+    color: #228B22; /* Màu xanh lá ForestGreen khi đang nói */
     animation: pulse-speaker 1s infinite alternate; /* Hiệu ứng nhấp nháy */
 }
 
@@ -169,6 +169,6 @@ h1 {
 
 /* Optional: Add a subtle pulse for the message being spoken */
 .bot-message.speaking-active {
-    box-shadow: 0 0 8px rgba(160, 75, 209, 0.6); /* Màu tím nhạt */
+    box-shadow: 0 0 8px rgba(160, 82, 45, 0.6); /* Màu nâu Sienna nhạt */
     animation: none; /* Bỏ animation cũ nếu có */
 }
