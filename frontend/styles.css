@@ -1,21 +1,26 @@
 /* General styles */
-body {
+html, body {
     font-family: Arial, sans-serif;
     background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    height: 100%; /* Chiếm toàn bộ chiều cao màn hình */
+    width: 100%;  /* Chiếm toàn bộ chiều rộng màn hình */
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    margin: 0;
+    overflow: hidden; /* Ngăn cuộn trang nếu chatbot tràn ra */
 }
 
 /* Chat container styling */
 .chat-container {
-    width: 400px;
-    max-width: 90%;
+    width: 95%; /* Chiếm 95% chiều rộng màn hình */
+    height: 95%; /* Chiếm 95% chiều cao màn hình */
+    max-width: 800px; /* Giới hạn chiều rộng tối đa để không quá lớn trên màn hình rộng */
+    max-height: 900px; /* Giới hạn chiều cao tối đa */
     background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Shadow nổi bật hơn */
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -25,37 +30,40 @@ body {
 h1 {
     background: #a04bd1; /* Màu tím */
     color: white;
-    padding: 10px;
+    padding: 15px; /* Tăng padding */
     text-align: center;
     margin: 0;
+    font-size: 1.8em; /* Tăng kích thước chữ */
+    border-bottom: 1px solid #8e3cb9; /* Thêm đường viền dưới */
 }
 
 /* Chat window styling */
 .chat-window {
-    padding: 10px;
+    padding: 15px; /* Tăng padding */
     flex-grow: 1;
     overflow-y: auto;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #eee;
     display: flex;
     flex-direction: column;
-    max-height: 400px; /* Fixed height to make it scrollable */
+    /* max-height: 400px; Bỏ fixed height, giờ nó sẽ tự co giãn theo container */
 }
 
 /* Message bubble styling */
 .chat-message {
-    padding: 10px;
-    margin: 10px 0;
+    padding: 12px 18px; /* Tăng padding bong bóng */
+    margin: 8px 0; /* Giảm margin một chút */
     border-radius: 20px;
-    max-width: 70%;
+    max-width: 80%; /* Tăng max-width để tin nhắn dài hơn trên màn hình rộng */
     word-wrap: break-word;
     display: inline-block;
+    line-height: 1.4; /* Tăng khoảng cách dòng */
 }
 
 /* Bot message styling */
 .bot-message {
     background: #f0f0f0;
     align-self: flex-start;
-    border-radius: 20px 20px 20px 0;
+    border-radius: 20px 20px 20px 5px; /* Bo tròn góc dưới trái ít hơn */
 }
 
 /* User message styling */
@@ -63,49 +71,52 @@ h1 {
     background: #a04bd1; /* Màu tím */
     color: white;
     align-self: flex-end;
-    border-radius: 20px 20px 0 20px;
+    border-radius: 20px 20px 5px 20px; /* Bo tròn góc dưới phải ít hơn */
 }
 
 /* Input area styling */
 .chat-input {
     display: flex;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #eee;
     padding: 10px;
     align-items: center;
+    background-color: white; /* Đảm bảo nền trắng */
 }
 
 /* Input field styling */
 .chat-input input {
     flex-grow: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 20px;
+    padding: 12px 15px; /* Tăng padding input */
+    border: 1px solid #ddd; /* Thêm border cho input */
+    border-radius: 25px; /* Bo tròn nhiều hơn */
     outline: none;
-    background: #f5f5f5;
-    margin-right: 10px; /* Khoảng cách với các nút */
+    background: #f9f9f9; /* Nền nhạt hơn */
+    margin-right: 10px;
+    font-size: 1em;
 }
 
 /* Placeholder text styling */
 .chat-input input::placeholder {
-    color: #aaa;
+    color: #999;
 }
 
 /* Unified button styling for mic, speaker, and send */
 .chat-input button {
-    background: none; /* Mặc định không có nền */
+    background: none; 
     border: none;
     cursor: pointer;
     padding: 10px;
     color: #a04bd1; /* Màu tím cho icon */
-    font-size: 1.2em; /* Kích thước icon */
-    display: flex; /* Để căn giữa icon */
+    font-size: 1.4em; /* Tăng kích thước icon */
+    display: flex; 
     align-items: center;
     justify-content: center;
-    transition: color 0.3s ease; /* Hiệu ứng hover */
+    transition: color 0.3s ease, transform 0.2s ease; /* Thêm hiệu ứng transform */
 }
 
 .chat-input button:hover {
     color: #ff00c3; /* Màu hồng khi hover */
+    transform: translateY(-2px); /* Nhấc nhẹ nút lên khi hover */
 }
 
 .chat-input button:focus {
@@ -114,35 +125,50 @@ h1 {
 
 /* Specific styling for mic button */
 .chat-input button#mic-button {
-    margin-right: 5px; /* Khoảng cách giữa mic và loa */
+    margin-right: 5px; 
 }
 
 /* Specific styling for speaker button */
 .chat-input button#speaker-button {
-    margin-right: 5px; /* Khoảng cách giữa loa và nút gửi */
+    margin-right: 5px; 
 }
-
 
 /* Style for when recording is active (mic button) */
 .chat-input button#mic-button.recording {
     color: #ff0055; /* Màu đỏ để chỉ trạng thái ghi âm */
+    animation: pulse-mic 1s infinite alternate; /* Hiệu ứng nhấp nháy */
+}
+
+@keyframes pulse-mic {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+    to {
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
 }
 
 /* Style for when speaking is active (speaker button) */
 #speaker-button.speaking {
     color: #28a745; /* Màu xanh lá khi đang nói */
+    animation: pulse-speaker 1s infinite alternate; /* Hiệu ứng nhấp nháy */
 }
 
-/* Optional: Add a subtle animation for speaking message */
-.bot-message.speaking-active {
-    animation: pulse-speaking 1s infinite alternate;
-}
-
-@keyframes pulse-speaking {
+@keyframes pulse-speaker {
     from {
-        box-shadow: 0 0 0 0 rgba(160, 75, 209, 0.4); /* Màu tím nhạt */
+        transform: scale(1);
+        opacity: 1;
     }
     to {
-        box-shadow: 0 0 0 5px rgba(160, 75, 209, 0); /* Màu tím nhạt */
+        transform: scale(1.1);
+        opacity: 0.7;
     }
+}
+
+/* Optional: Add a subtle pulse for the message being spoken */
+.bot-message.speaking-active {
+    box-shadow: 0 0 8px rgba(160, 75, 209, 0.6); /* Màu tím nhạt */
+    animation: none; /* Bỏ animation cũ nếu có */
 }
