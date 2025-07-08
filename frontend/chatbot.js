@@ -11,9 +11,15 @@ let isRecording = false;
 // Mỗi phần tử sẽ là một đối tượng { role: 'user' | 'assistant', content: 'tin nhắn' }
 let conversationHistory = []; 
 
+// === BIẾN MỚI CHO CHỨC NĂNG TTS BẰNG NÚT ===
+let currentAudio = null; // Để lưu đối tượng Audio hiện tại
+let isSpeaking = false; // Trạng thái đang nói hay không
+
 // Hàm Text-to-Speech (gọi đến backend đã dùng OpenAI)
-async function speakText(text) {
-    if (!text || text.trim() === '') return;
+// Hàm này giờ sẽ tải âm thanh nhưng KHÔNG TỰ ĐỘNG PHÁT.
+// Nó trả về một Promise giải quyết với URL Blob (hoặc null nếu lỗi).
+async function getAudioBlobUrl(text) {
+    if (!text || text.trim() === '') return null;
     try {
         const response = await fetch(`${BACKEND_URL}/tts`, {
             method: 'POST',
@@ -25,29 +31,100 @@ async function speakText(text) {
             console.error('Backend TTS returned an error. Status:', response.status);
             const errorDetails = await response.text();
             console.error('Error details:', errorDetails);
-            return;
+            return null;
         }
 
-        // OpenAI TTS stream trực tiếp file audio dưới dạng Blob
         const audioBlob = await response.blob();
-        const audioUrl = URL.createObjectURL(audioBlob);
-
-        const audio = new Audio(audioUrl);
-        audio.play().catch(e => {
-            console.error("Lỗi khi phát âm thanh từ URL Blob:", audioUrl, e);
-            // Có thể thêm thông báo cho người dùng nếu trình duyệt chặn autoplay
-            // alert("Trình duyệt có thể đã chặn tự động phát âm thanh. Vui lòng tương tác với trang để bật âm thanh.");
-        });
-
-        // Giải phóng URL Blob sau khi audio kết thúc để tránh rò rỉ bộ nhớ
-        audio.onended = () => {
-            URL.revokeObjectURL(audioUrl);
-        };
+        return URL.createObjectURL(audioBlob);
 
     } catch (error) {
-        console.error('Lỗi với Text-to-Speech:', error);
+        console.error('Lỗi khi lấy audio từ TTS:', error);
+        return null;
     }
 }
+
+// Hàm điều khiển việc phát/dừng âm thanh
+async function toggleSpeech() {
+    const speakerButton = document.getElementById('speaker-button');
+    const chatWindow = document.getElementById('chat-window');
+    const lastBotMessageDiv = chatWindow.querySelector('.bot-message:last-child');
+    
+    // Lấy tin nhắn cuối cùng của bot
+    const lastBotMessage = conversationHistory.findLast(msg => msg.role === 'assistant');
+    if (!lastBotMessage || !lastBotMessage.content) {
+        console.warn("Không tìm thấy tin nhắn bot để phát.");
+        return;
+    }
+
+    if (isSpeaking && currentAudio) {
+        // Nếu đang nói, thì dừng
+        currentAudio.pause();
+        currentAudio.currentTime = 0; // Reset về đầu
+        isSpeaking = false;
+        speakerButton.classList.remove('speaking');
+        speakerButton.title = 'Speak Response'; // Đổi tooltip
+        console.log("TTS stopped.");
+        if (lastBotMessageDiv) lastBotMessageDiv.classList.remove('speaking-active');
+
+    } else {
+        // Nếu chưa nói hoặc đã dừng, thì bắt đầu nói
+        speakerButton.classList.add('speaking');
+        speakerButton.title = 'Stop Speaking'; // Đổi tooltip
+        if (lastBotMessageDiv) lastBotMessageDiv.classList.add('speaking-active');
+
+
+        // Nếu chưa có audio hoặc là tin nhắn mới, tải audio mới
+        if (!currentAudio || currentAudio.ended || currentAudio.src !== lastBotMessage.audioUrl) {
+             // Lưu URL Blob vào lịch sử để không tải lại nhiều lần
+            if (!lastBotMessage.audioUrl) {
+                lastBotMessage.audioUrl = await getAudioBlobUrl(lastBotMessage.content);
+            }
+            
+            if (lastBotMessage.audioUrl) {
+                if (currentAudio) {
+                    URL.revokeObjectURL(currentAudio.src); // Giải phóng URL cũ nếu có
+                }
+                currentAudio = new Audio(lastBotMessage.audioUrl);
+                currentAudio.onended = () => {
+                    isSpeaking = false;
+                    speakerButton.classList.remove('speaking');
+                    speakerButton.title = 'Speak Response';
+                    if (lastBotMessageDiv) lastBotMessageDiv.classList.remove('speaking-active');
+                    URL.revokeObjectURL(lastBotMessage.audioUrl); // Giải phóng URL sau khi nói xong
+                    lastBotMessage.audioUrl = undefined; // Đánh dấu là không còn URL nữa
+                    currentAudio = null; // Xóa tham chiếu
+                };
+                currentAudio.play().catch(e => {
+                    console.error("Lỗi khi phát âm thanh:", e);
+                    isSpeaking = false;
+                    speakerButton.classList.remove('speaking');
+                    speakerButton.title = 'Speak Response';
+                    if (lastBotMessageDiv) lastBotMessageDiv.classList.remove('speaking-active');
+                    alert("Trình duyệt có thể đã chặn tự động phát âm thanh. Vui lòng tương tác với trang để bật âm thanh.");
+                });
+                isSpeaking = true;
+            } else {
+                console.error("Không thể lấy audio URL để phát.");
+                isSpeaking = false;
+                speakerButton.classList.remove('speaking');
+                speakerButton.title = 'Speak Response';
+                if (lastBotMessageDiv) lastBotMessageDiv.classList.remove('speaking-active');
+            }
+        } else {
+            // Nếu đã có audio và là cùng một tin nhắn, chỉ cần resume
+            currentAudio.play().catch(e => {
+                console.error("Lỗi khi resume âm thanh:", e);
+                isSpeaking = false;
+                speakerButton.classList.remove('speaking');
+                speakerButton.title = 'Speak Response';
+                if (lastBotMessageDiv) lastBotMessageDiv.classList.remove('speaking-active');
+            });
+            isSpeaking = true;
+        }
+        console.log("TTS started/resumed.");
+    }
+}
+
 
 // Hàm Speech-to-Text (gọi đến backend đã dùng OpenAI Whisper)
 async function startSpeechToText() {
@@ -104,9 +181,9 @@ async function startSpeechToText() {
 // Hàm gửi tin nhắn (gọi đến backend) - Đã được chỉnh sửa để có ngữ cảnh
 async function sendMessage() {
     const messageInput = document.getElementById('message');
-    const message = messageInput.value.trim(); // Dùng .trim() để loại bỏ khoảng trắng thừa
+    const message = messageInput.value.trim(); 
     const chatWindow = document.getElementById('chat-window');
-    if (message === '') return; // Kiểm tra tin nhắn rỗng sau trim
+    if (message === '') return; 
 
     // Thêm tin nhắn người dùng vào lịch sử và hiển thị lên UI
     conversationHistory.push({ role: 'user', content: message }); 
@@ -124,8 +201,20 @@ async function sendMessage() {
     chatWindow.appendChild(botMessageDiv);
     chatWindow.scrollTop = chatWindow.scrollHeight;
 
+    // Khi có tin nhắn mới, dừng nếu đang phát âm thanh cũ
+    if (isSpeaking && currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+        isSpeaking = false;
+        document.getElementById('speaker-button').classList.remove('speaking');
+        document.getElementById('speaker-button').title = 'Speak Response';
+        if (currentAudio.src.startsWith('blob:')) {
+            URL.revokeObjectURL(currentAudio.src);
+        }
+        currentAudio = null;
+    }
+
     try {
-        // Gửi TOÀN BỘ lịch sử cuộc trò chuyện đến backend
         const response = await fetch(`${BACKEND_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -135,15 +224,15 @@ async function sendMessage() {
         const data = await response.json();
         const botMessage = data.botMessage;
 
-        // Cập nhật tin nhắn của bot và thêm vào lịch sử
         botMessageDiv.innerText = botMessage;
-        conversationHistory.push({ role: 'assistant', content: botMessage }); // Thêm tin nhắn bot vào lịch sử
-        speakText(botMessage); // Đảm bảo dòng này không bị comment nếu bạn muốn voice
+        conversationHistory.push({ role: 'assistant', content: botMessage }); 
+        
+        // --- KHÔNG CÒN GỌI speakText(botMessage) TỰ ĐỘNG Ở ĐÂY NỮA ---
+        // Giờ đây người dùng sẽ ấn nút loa để nói
 
     } catch (error) {
         console.error('Error sending message:', error);
         botMessageDiv.innerText = 'Sorry, an error occurred.';
-        // Nếu có lỗi, loại bỏ tin nhắn người dùng cuối cùng khỏi lịch sử để không làm sai lệch ngữ cảnh
         if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === 'user') {
             conversationHistory.pop();
         }
@@ -154,5 +243,8 @@ async function sendMessage() {
 document.getElementById('message').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });
-// Đảm bảo nút mic được gán đúng sự kiện
+
 document.getElementById('mic-button').addEventListener('click', startSpeechToText);
+
+// === THÊM EVENT LISTENER CHO NÚT LOA MỚI ===
+document.getElementById('speaker-button').addEventListener('click', toggleSpeech);

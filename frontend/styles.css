@@ -23,7 +23,7 @@ body {
 
 /* Chatbot header styling */
 h1 {
-    background: #a04bd1;
+    background: #a04bd1; /* Màu tím */
     color: white;
     padding: 10px;
     text-align: center;
@@ -60,7 +60,7 @@ h1 {
 
 /* User message styling */
 .user-message {
-    background: #a04bd1;
+    background: #a04bd1; /* Màu tím */
     color: white;
     align-self: flex-end;
     border-radius: 20px 20px 0 20px;
@@ -82,7 +82,7 @@ h1 {
     border-radius: 20px;
     outline: none;
     background: #f5f5f5;
-    margin-right: 10px;
+    margin-right: 10px; /* Khoảng cách với các nút */
 }
 
 /* Placeholder text styling */
@@ -90,33 +90,59 @@ h1 {
     color: #aaa;
 }
 
-/* Send button styling */
+/* Unified button styling for mic, speaker, and send */
 .chat-input button {
-    background: none;
+    background: none; /* Mặc định không có nền */
     border: none;
     cursor: pointer;
     padding: 10px;
-    color: #a04bd1;
+    color: #a04bd1; /* Màu tím cho icon */
+    font-size: 1.2em; /* Kích thước icon */
+    display: flex; /* Để căn giữa icon */
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease; /* Hiệu ứng hover */
 }
 
-/* Send button hover effect */
 .chat-input button:hover {
-    color: #ff00c3;
+    color: #ff00c3; /* Màu hồng khi hover */
 }
 
-/* Remove focus outline from button */
 .chat-input button:focus {
     outline: none;
 }
 
-/* === STYLE MỚI === */
-/* Mic button styling */
+/* Specific styling for mic button */
 .chat-input button#mic-button {
-    padding: 10px;
-    margin-right: 5px; /* Add some space between mic and send button */
+    margin-right: 5px; /* Khoảng cách giữa mic và loa */
 }
 
-/* Style for when recording is active */
-.chat-input button.recording {
-    color: #ff0055; /* Change color to indicate recording */
+/* Specific styling for speaker button */
+.chat-input button#speaker-button {
+    margin-right: 5px; /* Khoảng cách giữa loa và nút gửi */
+}
+
+
+/* Style for when recording is active (mic button) */
+.chat-input button#mic-button.recording {
+    color: #ff0055; /* Màu đỏ để chỉ trạng thái ghi âm */
+}
+
+/* Style for when speaking is active (speaker button) */
+#speaker-button.speaking {
+    color: #28a745; /* Màu xanh lá khi đang nói */
+}
+
+/* Optional: Add a subtle animation for speaking message */
+.bot-message.speaking-active {
+    animation: pulse-speaking 1s infinite alternate;
+}
+
+@keyframes pulse-speaking {
+    from {
+        box-shadow: 0 0 0 0 rgba(160, 75, 209, 0.4); /* Màu tím nhạt */
+    }
+    to {
+        box-shadow: 0 0 0 5px rgba(160, 75, 209, 0); /* Màu tím nhạt */
+    }
 }
