@@ -7,7 +7,11 @@ let mediaRecorder;
 let audioChunks = [];
 let isRecording = false;
 
-// Hàm Text-to-Speech (gọi đến backend)
+// Biến toàn cục mới để lưu lịch sử cuộc trò chuyện
+// Mỗi phần tử sẽ là một đối tượng { role: 'user' | 'assistant', content: 'tin nhắn' }
+let conversationHistory = []; 
+
+// Hàm Text-to-Speech (gọi đến backend đã dùng OpenAI)
 async function speakText(text) {
     if (!text || text.trim() === '') return;
     try {
@@ -16,24 +20,36 @@ async function speakText(text) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: text })
         });
-        const data = await response.json(); // Backend giờ sẽ trả về { audioUrl: "link_mp3_thực_sự" }
 
-        // Kiểm tra xem backend có trả về audioUrl hợp lệ không
-        if (data && data.audioUrl) {
-            const audio = new Audio(data.audioUrl); // Sử dụng link MP3 trực tiếp từ backend
-            audio.play().catch(e => {
-                console.error("Lỗi khi phát âm thanh từ URL:", data.audioUrl, e);
-                // Bạn có thể thêm thông báo lỗi cho người dùng ở đây nếu muốn
-            });
-        } else {
-            console.error('Backend TTS did not return a valid audioUrl:', data);
+        if (!response.ok) {
+            console.error('Backend TTS returned an error. Status:', response.status);
+            const errorDetails = await response.text();
+            console.error('Error details:', errorDetails);
+            return;
         }
+
+        // OpenAI TTS stream trực tiếp file audio dưới dạng Blob
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+
+        const audio = new Audio(audioUrl);
+        audio.play().catch(e => {
+            console.error("Lỗi khi phát âm thanh từ URL Blob:", audioUrl, e);
+            // Có thể thêm thông báo cho người dùng nếu trình duyệt chặn autoplay
+            // alert("Trình duyệt có thể đã chặn tự động phát âm thanh. Vui lòng tương tác với trang để bật âm thanh.");
+        });
+
+        // Giải phóng URL Blob sau khi audio kết thúc để tránh rò rỉ bộ nhớ
+        audio.onended = () => {
+            URL.revokeObjectURL(audioUrl);
+        };
+
     } catch (error) {
         console.error('Lỗi với Text-to-Speech:', error);
     }
 }
 
-// Hàm Speech-to-Text (gọi đến backend)
+// Hàm Speech-to-Text (gọi đến backend đã dùng OpenAI Whisper)
 async function startSpeechToText() {
     const micButton = document.getElementById('mic-button');
     if (isRecording) {
@@ -55,7 +71,7 @@ async function startSpeechToText() {
         mediaRecorder.onstop = async () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
             const formData = new FormData();
-            formData.append('audio', audioBlob); // Đặt tên field là 'audio'
+            formData.append('audio', audioBlob); // Backend đang mong đợi tên field là 'audio'
 
             try {
                 // Gửi file âm thanh đến backend
@@ -64,8 +80,10 @@ async function startSpeechToText() {
                     body: formData
                 });
                 const data = await response.json();
-                if (data.hypotheses && data.hypotheses.length > 0) {
-                    document.getElementById('message').value = data.hypotheses[0].utterance;
+                
+                // OpenAI STT trả về kết quả trong trường 'text'
+                if (data && data.text) { 
+                    document.getElementById('message').value = data.text;
                 } else {
                     document.getElementById('message').value = "Sorry, I could not understand.";
                 }
@@ -83,13 +101,7 @@ async function startSpeechToText() {
     }
 }
 
-// ... (các biến và hàm hiện có, đảm bảo có 'let conversationHistory = [];' ở đầu file) ...
-
-// Biến toàn cục mới để lưu lịch sử cuộc trò chuyện
-// Mỗi phần tử sẽ là một đối tượng { role: 'user' | 'assistant', content: 'tin nhắn' }
-let conversationHistory = []; 
-
-// Hàm gửi tin nhắn (gọi đến backend)
+// Hàm gửi tin nhắn (gọi đến backend) - Đã được chỉnh sửa để có ngữ cảnh
 async function sendMessage() {
     const messageInput = document.getElementById('message');
     const message = messageInput.value.trim(); // Dùng .trim() để loại bỏ khoảng trắng thừa
@@ -117,7 +129,6 @@ async function sendMessage() {
         const response = await fetch(`${BACKEND_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            // THAY ĐỔI LỚN Ở ĐÂY: Gửi mảng conversationHistory
             body: JSON.stringify({ messages: conversationHistory }) 
         });
 

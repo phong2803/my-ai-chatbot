@@ -6,8 +6,9 @@ const multer = require('multer');
 const fetch = require('node-fetch'); // node-fetch là cần thiết cho các cuộc gọi fetch trong Node.js
 
 // Lấy API keys từ file .env một cách an toàn
-const FPT_API_KEY = process.env.FPT_API_KEY;
+// const FPT_API_KEY = process.env.FPT_API_KEY; // Đã loại bỏ FPT_API_KEY
 const CHATBASE_API_KEY = process.env.CHATBASE_API_KEY;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY; // Thêm dòng này để lấy OpenAI API Key
 
 // Khởi tạo Express app
 const app = express();
@@ -22,8 +23,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Định nghĩa các nguồn (origins) được phép truy cập backend của bạn
 const allowedOrigins = [
     'https://thuoc-quanh-nha.netlify.app', // Tên miền chính thức của frontend bạn trên Netlify
-    'http://localhost:3000',             // Nếu bạn đang chạy frontend cục bộ trên cổng 3000
-    'http://localhost:8080'              // Nếu bạn đang chạy frontend cục bộ trên cổng 8080 (hoặc cổng nào đó bạn đang dùng)
+    'http://localhost:3000',               // Nếu bạn đang chạy frontend cục bộ trên cổng 3000
+    'http://localhost:8080'                // Nếu bạn đang chạy frontend cục bộ trên cổng 8080 (hoặc cổng nào đó bạn đang dùng)
 ];
 
 app.use(cors({
@@ -110,7 +111,8 @@ app.post('/chat', upload.none(), async (req, res) => {
         res.status(500).json({ error: 'Failed to get response from Chatbase due to an unexpected server error.' });
     }
 });
-// 2. Endpoint cho Speech-to-Text (FPT.AI)
+
+// --- 2. Endpoint cho Speech-to-Text (OpenAI Whisper) ---
 app.post('/stt', upload.single('audio'), async (req, res) => { // Dùng upload.single('audio') để xử lý file audio
     if (!req.file) {
         return res.status(400).json({ error: 'No audio file uploaded.' });
@@ -118,69 +120,76 @@ app.post('/stt', upload.single('audio'), async (req, res) => { // Dùng upload.s
 
     try {
         const audioBuffer = req.file.buffer;
-        const fptResponse = await fetch('https://api.fpt.ai/hmi/asr/general', {
-            method: 'POST',
-            headers: { 'api-key': FPT_API_KEY },
-            body: audioBuffer,
-        });
+        
+        // Tạo FormData để gửi file audio
+        const formData = new FormData();
+        // Append file với tên 'file', Blob và tên file gốc
+        formData.append('file', new Blob([audioBuffer], { type: req.file.mimetype }), req.file.originalname);
+        formData.append('model', 'whisper-1');
+        formData.append('language', 'vi'); // Rất quan trọng để chỉ định ngôn ngữ là tiếng Việt
 
-        const data = await fptResponse.json();
-        res.json(data); 
-
-    } catch (error) {
-        console.error('Error in /stt endpoint:', error);
-        res.status(500).json({ error: 'Failed to process speech' });
-    }
-});
-
-// 3. Endpoint cho Text-to-Speech (FPT.AI)
-app.post('/tts', async (req, res) => {
-    try {
-        const text = req.body.text;
-        console.log('Received TTS request for text:', text); 
-
-        const fptResponse = await fetch('https://api.fpt.ai/hmi/tts/v5', {
+        const openaiResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
             method: 'POST',
             headers: {
-                'api-key': FPT_API_KEY,
-                'Content-Type': 'application/json',
-                'voice': 'banmai' // Bạn có thể thay đổi giọng nói nếu muốn
+                'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                // 'Content-Type': 'multipart/form-data' - fetch sẽ tự thiết lập đúng khi dùng FormData
             },
-            body: JSON.stringify({ 'text': text })
+            body: formData,
         });
 
-        const initialFptData = await fptResponse.json();
-        console.log('Initial FPT.AI TTS response:', initialFptData); 
+        const data = await openaiResponse.json();
+        console.log('OpenAI STT response:', data);
 
-        if (initialFptData && initialFptData.async) {
-            const asyncUrl = initialFptData.async;
-            console.log('FPT.AI returned an async link, fetching final audio from:', asyncUrl);
+        if (!openaiResponse.ok) {
+            console.error('OpenAI STT API returned an error:', openaiResponse.status, data);
+            return res.status(openaiResponse.status).json({ error: 'OpenAI STT API error', details: data });
+        }
 
-            // Tăng thời gian chờ lên 8 giây. FPT.AI cần thời gian để xử lý audio.
-            await new Promise(resolve => setTimeout(resolve, 8000)); // Thử 8 giây để đảm bảo đủ thời gian
-
-            const finalAudioResponse = await fetch(asyncUrl);
-
-            if (finalAudioResponse.ok) {
-                const finalAudioUrl = finalAudioResponse.url; 
-                console.log('Final audio URL obtained:', finalAudioUrl);
-                res.json({ audioUrl: finalAudioUrl }); // Trả về URL MP3 cho frontend
-            } else {
-                const errorBody = await finalAudioResponse.text();
-                console.error('Failed to fetch final audio from async link. Status:', finalAudioResponse.status, 'Body:', errorBody);
-                return res.status(500).json({ error: 'Failed to fetch final audio from FPT.AI async link', details: errorBody });
-            }
-
-        } else if (initialFptData && initialFptData.data && initialFptData.data.url) {
-            console.log('FPT.AI returned direct audio URL:', initialFptData.data.url);
-            res.json({ audioUrl: initialFptData.data.url }); 
+        if (data && data.text) {
+            res.json({ text: data.text }); // Trả về text đã chuyển đổi
         } else {
-            console.error('FPT.AI TTS response invalid or missing expected URL:', initialFptData);
-            res.status(500).json({ error: 'FPT.AI TTS response invalid', details: initialFptData });
+            console.error('OpenAI STT response missing expected text:', data);
+            res.status(500).json({ error: 'OpenAI STT response invalid', details: data });
         }
 
     } catch (error) {
-        console.error('Error in /tts endpoint:', error);
+        console.error('Error in /stt endpoint with OpenAI:', error);
+        res.status(500).json({ error: 'Failed to process speech with OpenAI', details: error.message });
+    }
+});
+
+// --- 3. Endpoint cho Text-to-Speech (OpenAI TTS) ---
+app.post('/tts', async (req, res) => {
+    try {
+        const text = req.body.text;
+        console.log('Received TTS request for text:', text);
+
+        const openaiResponse = await fetch('https://api.openai.com/v1/audio/speech', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                model: "tts-1", // Hoặc "tts-1-hd" cho chất lượng cao hơn
+                input: text,
+                voice: "nova", // Chọn một trong 6 giọng phù hợp: alloy, echo, fable, onyx, nova, shimmer
+                response_format: "mp3"
+            })
+        });
+
+        if (!openaiResponse.ok) {
+            const errorBody = await openaiResponse.text();
+            console.error('OpenAI TTS API returned an error:', openaiResponse.status, errorBody);
+            return res.status(openaiResponse.status).json({ error: 'OpenAI TTS API error', details: errorBody });
+        }
+
+        // OpenAI trả về trực tiếp file audio dưới dạng stream
+        res.setHeader('Content-Type', 'audio/mpeg'); // Đặt Content-Type là audio/mpeg cho file mp3
+        openaiResponse.body.pipe(res); // Chuyển trực tiếp stream từ OpenAI về client
+
+    } catch (error) {
+        console.error('Error in /tts endpoint with OpenAI:', error);
         res.status(500).json({ error: 'Failed to synthesize speech', details: error.message });
     }
 });
