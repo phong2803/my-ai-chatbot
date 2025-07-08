@@ -83,14 +83,21 @@ async function startSpeechToText() {
     }
 }
 
+// ... (các biến và hàm hiện có, đảm bảo có 'let conversationHistory = [];' ở đầu file) ...
+
+// Biến toàn cục mới để lưu lịch sử cuộc trò chuyện
+// Mỗi phần tử sẽ là một đối tượng { role: 'user' | 'assistant', content: 'tin nhắn' }
+let conversationHistory = []; 
+
 // Hàm gửi tin nhắn (gọi đến backend)
 async function sendMessage() {
     const messageInput = document.getElementById('message');
-    const message = messageInput.value;
+    const message = messageInput.value.trim(); // Dùng .trim() để loại bỏ khoảng trắng thừa
     const chatWindow = document.getElementById('chat-window');
-    if (message.trim() === '') return;
+    if (message === '') return; // Kiểm tra tin nhắn rỗng sau trim
 
-    // Hiển thị tin nhắn người dùng
+    // Thêm tin nhắn người dùng vào lịch sử và hiển thị lên UI
+    conversationHistory.push({ role: 'user', content: message }); 
     const userMessageDiv = document.createElement('div');
     userMessageDiv.classList.add('chat-message', 'user-message');
     userMessageDiv.innerText = message;
@@ -101,28 +108,34 @@ async function sendMessage() {
     // Hiển thị placeholder cho tin nhắn bot
     const botMessageDiv = document.createElement('div');
     botMessageDiv.classList.add('chat-message', 'bot-message');
-    botMessageDiv.innerText = '...'; // Dấu hiệu bot đang "suy nghĩ"
+    botMessageDiv.innerText = '...'; 
     chatWindow.appendChild(botMessageDiv);
     chatWindow.scrollTop = chatWindow.scrollHeight;
 
     try {
-        // Gửi tin nhắn đến backend
+        // Gửi TOÀN BỘ lịch sử cuộc trò chuyện đến backend
         const response = await fetch(`${BACKEND_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: message })
+            // THAY ĐỔI LỚN Ở ĐÂY: Gửi mảng conversationHistory
+            body: JSON.stringify({ messages: conversationHistory }) 
         });
 
         const data = await response.json();
         const botMessage = data.botMessage;
 
-        // Cập nhật tin nhắn của bot và phát âm thanh
+        // Cập nhật tin nhắn của bot và thêm vào lịch sử
         botMessageDiv.innerText = botMessage;
-        // speakText(botMessage);
+        conversationHistory.push({ role: 'assistant', content: botMessage }); // Thêm tin nhắn bot vào lịch sử
+        speakText(botMessage); // Đảm bảo dòng này không bị comment nếu bạn muốn voice
 
     } catch (error) {
         console.error('Error sending message:', error);
         botMessageDiv.innerText = 'Sorry, an error occurred.';
+        // Nếu có lỗi, loại bỏ tin nhắn người dùng cuối cùng khỏi lịch sử để không làm sai lệch ngữ cảnh
+        if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === 'user') {
+            conversationHistory.pop();
+        }
     }
 }
 

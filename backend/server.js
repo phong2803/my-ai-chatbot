@@ -48,17 +48,25 @@ app.use(express.json());
 
 
 // --- CÁC ĐƯỜNG DẪN (API ENDPOINTS) ---
-
 app.post('/chat', upload.none(), async (req, res) => { 
     try {
-        const userMessage = req.body.message;
-        console.log('Received message from frontend:', userMessage); 
+        // THAY ĐỔI LỚN Ở ĐÂY: Nhận mảng tin nhắn từ frontend
+        // Frontend sẽ gửi một payload có dạng { messages: [...] }
+        const messages = req.body.messages; 
+
+        // Log: Xác nhận yêu cầu từ frontend đã đến đây và xem lịch sử
+        console.log('Received conversation history from frontend:', messages); 
+
+        // Lấy tin nhắn cuối cùng của người dùng (tùy chọn, để log rõ hơn)
+        const userMessage = messages[messages.length - 1]?.content;
+        console.log('User\'s current message:', userMessage);
 
         console.log('CHATBASE_API_KEY (loaded):', CHATBASE_API_KEY ? 'Yes' : 'No'); 
         console.log('Chatbot ID (in code):', 'fQ9R8KFVCa2pnpWp82_yU'); 
 
         const chatbaseRequestPayload = {
-            messages: [{ content: userMessage, role: 'user' }],
+            // THAY ĐỔI LỚN Ở ĐÂY: Gửi toàn bộ mảng messages
+            messages: messages, // Gửi toàn bộ lịch sử cuộc trò chuyện
             chatbotId: 'fQ9R8KFVCa2pnpWp82_yU', 
             stream: false,
             model: 'gpt-4o',
@@ -87,7 +95,7 @@ app.post('/chat', upload.none(), async (req, res) => {
 
         const data = await response.json();
         console.log('Chatbase parsed data (success):', data); 
-
+        
         // SỬA ĐỊNH DẠNG PHẢN HỒI CHO FRONTEND TẠI ĐÂY
         // Frontend mong đợi một trường tên là 'botMessage', không phải 'text'
         if (data && data.text) { 
@@ -102,7 +110,6 @@ app.post('/chat', upload.none(), async (req, res) => {
         res.status(500).json({ error: 'Failed to get response from Chatbase due to an unexpected server error.' });
     }
 });
-
 // 2. Endpoint cho Speech-to-Text (FPT.AI)
 app.post('/stt', upload.single('audio'), async (req, res) => { // Dùng upload.single('audio') để xử lý file audio
     if (!req.file) {
