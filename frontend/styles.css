@@ -207,7 +207,7 @@ h1 {
     .chat-container {
         /* ĐIỀU CHỈNH: Không còn 100vw/100vh nữa, thu nhỏ lại một chút */
         width: 95vw;   /* Chiếm 95% chiều rộng viewport */
-        height: 85vh;  /* Chiếm 90% chiều cao viewport */
+        height: 80vh;  /* Chiếm 90% chiều cao viewport */
         
         max-width: none; /* Bỏ giới hạn max-width trên di động */
         max-height: none; /* Bỏ giới hạn max-height trên di động */
