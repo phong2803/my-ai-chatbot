@@ -31,19 +31,19 @@ html, body {
 h1 {
     background: #A0522D; /* Màu nâu Sienna cho header */
     color: white;
-    padding: 15px; /* Tăng padding */
+    padding: 10px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho desktop */
     text-align: center;
     margin: 0;
-    font-size: 1.8em; /* Tăng kích thước chữ */
-    border-bottom: 1px solid #8B4513; /* Đường viền dưới nâu đậm hơn */
+    font-size: 1.8em;
+    border-bottom: 1px solid #8B4513;
 }
 
 /* Chat window styling */
 .chat-window {
-    padding: 15px; /* Tăng padding */
+    padding: 10px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho desktop */
     flex-grow: 1; /* Cho phép nó mở rộng hết không gian còn lại */
     overflow-y: auto;
-    border-bottom: 1px solid #eee; /* Giữ đường viền nhạt */
+    border-bottom: 1px solid #eee;
     display: flex;
     flex-direction: column;
     min-height: 0; /* RẤT QUAN TRỌNG trong Flexbox để item có thể co/giãn */
@@ -80,7 +80,7 @@ h1 {
 .chat-input {
     display: flex;
     border-top: 1px solid #eee;
-    padding: 10px;
+    padding: 8px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho desktop */
     align-items: center;
     background-color: white; /* Đảm bảo nền trắng */
 }
@@ -207,7 +207,7 @@ h1 {
     .chat-container {
         /* ĐIỀU CHỈNH: Không còn 100vw/100vh nữa, thu nhỏ lại một chút */
         width: 95vw;   /* Chiếm 95% chiều rộng viewport */
-        height: 80vh;  /* Chiếm 90% chiều cao viewport */
+        height: 75vh;  /* ✅ ĐÃ ĐIỀU CHỈNH: Chiều cao chatbot trên mobile */
         
         max-width: none; /* Bỏ giới hạn max-width trên di động */
         max-height: none; /* Bỏ giới hạn max-height trên di động */
@@ -218,12 +218,12 @@ h1 {
 
     /* Giữ các điều chỉnh padding và font-size khác cho di động */
     h1 {
-        padding: 12px;
+        padding: 8px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho mobile */
         font-size: 1.4em;
     }
 
     .chat-window {
-        padding: 8px;
+        padding: 5px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho mobile */
     }
 
     .chat-message {
@@ -234,10 +234,11 @@ h1 {
     }
 
     .chat-input {
-        padding: 6px;
+        padding: 5px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho mobile */
     }
 
     .chat-input input {
+        flex-grow: 1;
         padding: 10px 12px;
         font-size: 0.9em;
         margin-right: 5px;
@@ -253,6 +254,7 @@ h1 {
 @media (max-width: 480px) {
     h1 {
         font-size: 1.2em;
+        padding: 6px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho điện thoại cỡ nhỏ */
     }
 
     .chat-message {
@@ -267,4 +269,6 @@ h1 {
 
     .chat-input button {
         padding: 5px;
-        font-size:
+        font-size: 1em; /* ✅ ĐÃ HOÀN THIỆN: Khắc phục lỗi thiếu giá trị */
+    }
+}
