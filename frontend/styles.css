@@ -1,81 +1,84 @@
-/* General styles */
+/* UNIVERSAL RESET */
+* {
+    box-sizing: border-box; /* Quan trọng để padding/border không làm tăng kích thước */
+    margin: 0;
+    padding: 0;
+}
+
+/* General styles for desktop/large screens */
 html, body {
     font-family: Arial, sans-serif;
     background-color: #F5DEB3; /* Nền trang màu nâu nhạt */
-    margin: 0;
-    padding: 0;
-    /* TRÊN DESKTOP: Đảm bảo chiếm toàn bộ chiều cao viewport */
-    height: 100vh;
     width: 100vw;
+    height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* NGĂN cuộn trang TỔNG THỂ trên desktop */
+    overflow: hidden; /* Ngăn cuộn trang tổng thể trên desktop */
 }
 
-/* Chat container styling */
+/* Chat container styling for desktop/large screens */
 .chat-container {
-    width: 95%; /* Chiếm 95% chiều rộng trên màn hình lớn */
-    height: 95%; /* Chiếm 95% chiều cao trên màn hình lớn */
-    max-width: 800px; /* Giới hạn chiều rộng tối đa */
-    max-height: 900px; /* Giới hạn chiều cao tối đa */
-    background: white; /* Giữ nền trắng cho container chính */
+    width: 95%;
+    height: 95%;
+    max-width: 800px;
+    max-height: 900px;
+    background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Shadow nổi bật hơn */
-    overflow: hidden; /* Quan trọng: Ngăn overflow trong container chính */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
     display: flex;
-    flex-direction: column; /* Sắp xếp các phần tử con theo chiều dọc */
+    flex-direction: column;
 }
 
 /* Chatbot header styling */
 h1 {
     background: #A0522D; /* Màu nâu Sienna cho header */
     color: white;
-    padding: 15px; /* Tăng padding */
+    padding: 15px;
     text-align: center;
     margin: 0;
-    font-size: 1.8em; /* Tăng kích thước chữ */
-    border-bottom: 1px solid #8B4513; /* Đường viền dưới nâu đậm hơn */
-    flex-shrink: 0; /* KHÔNG CHO TIÊU ĐỀ BỊ CO LẠI */
+    font-size: 1.8em;
+    border-bottom: 1px solid #8B4513;
+    flex-shrink: 0;
 }
 
 /* Chat window styling */
 .chat-window {
-    padding: 15px; /* Tăng padding */
+    padding: 15px;
     flex-grow: 1; /* Cho phép nó mở rộng hết không gian còn lại */
     overflow-y: auto; /* THANH CUỘN CHỈ XUẤT HIỆN BÊN TRONG KHU VỰC TIN NHẮN */
-    border-bottom: 1px solid #eee; /* Giữ đường viền nhạt */
+    border-bottom: 1px solid #eee;
     display: flex;
-    flex-direction: column; /* Sắp xếp tin nhắn theo cột */
+    flex-direction: column;
     min-height: 0; /* Quan trọng cho flexbox để nó co lại đúng cách nếu cần */
-    /* KHÔNG ĐẶT max-height Ở ĐÂY CHO DESKTOP ĐỂ NÓ DÙNG flex-grow 1 */
 }
 
 /* Message bubble styling */
 .chat-message {
-    padding: 12px 18px; /* Tăng padding bong bóng */
-    margin: 8px 0; /* Giảm margin một chút */
+    padding: 12px 18px;
+    margin: 8px 0;
     border-radius: 20px;
-    max-width: 80%; /* Tăng max-width để tin nhắn dài hơn trên màn hình rộng */
+    max-width: 80%;
     word-wrap: break-word;
     display: inline-block;
-    line-height: 1.4; /* Tăng khoảng cách dòng */
+    line-height: 1.4;
 }
 
 /* Bot message styling */
 .bot-message {
-    background: #CD853F; /* Màu nâu Peru cho tin nhắn của bot */
-    color: white; /* Đổi màu chữ sang trắng để dễ đọc trên nền nâu */
+    background: #CD853F;
+    color: white;
     align-self: flex-start;
-    border-radius: 20px 20px 20px 5px; /* Bo tròn góc dưới trái ít hơn */
+    border-radius: 20px 20px 20px 5px;
 }
 
 /* User message styling */
 .user-message {
-    background: #8B4513; /* Màu nâu SaddleBrown cho tin nhắn của người dùng */
-    color: white; /* Giữ màu chữ trắng */
+    background: #8B4513;
+    color: white;
     align-self: flex-end;
-    border-radius: 20px 20px 5px 20px; /* Bo tròn góc dưới phải ít hơn */
+    border-radius: 20px 20px 5px 20px;
 }
 
 /* Input area styling */
@@ -84,18 +87,18 @@ h1 {
     border-top: 1px solid #eee;
     padding: 10px;
     align-items: center;
-    background-color: white; /* Đảm bảo nền trắng */
-    flex-shrink: 0; /* KHÔNG CHO KHU VỰC INPUT BỊ CO LẠI */
+    background-color: white;
+    flex-shrink: 0;
 }
 
 /* Input field styling */
 .chat-input input {
     flex-grow: 1;
-    padding: 12px 15px; /* Tăng padding input */
-    border: 1px solid #ddd; /* Thêm border cho input */
-    border-radius: 25px; /* Bo tròn nhiều hơn */
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
     outline: none;
-    background: #f9f9f9; /* Nền nhạt hơn */
+    background: #f9f9f9;
     margin-right: 10px;
     font-size: 1em;
 }
@@ -111,17 +114,17 @@ h1 {
     border: none;
     cursor: pointer;
     padding: 10px;
-    color: #A0522D; /* Màu nâu Sienna cho icon */
-    font-size: 1.4em; /* Tăng kích thước icon */
+    color: #A0522D;
+    font-size: 1.4em;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.3s ease, transform 0.2s ease; /* Thêm hiệu ứng transform */
+    transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .chat-input button:hover {
-    color: #D2691E; /* Màu nâu Chocolate khi hover */
-    transform: translateY(-2px); /* Nhấc nhẹ nút lên khi hover */
+    color: #D2691E;
+    transform: translateY(-2px);
 }
 
 .chat-input button:focus {
@@ -140,8 +143,8 @@ h1 {
 
 /* Style for when recording is active (mic button) */
 .chat-input button#mic-button.recording {
-    color: #B22222; /* Màu đỏ BrickRed để chỉ trạng thái ghi âm */
-    animation: pulse-mic 1s infinite alternate; /* Hiệu ứng nhấp nháy */
+    color: #B22222;
+    animation: pulse-mic 1s infinite alternate;
 }
 
 @keyframes pulse-mic {
@@ -157,8 +160,8 @@ h1 {
 
 /* Style for when speaking is active (speaker button) */
 #speaker-button.speaking {
-    color: #228B22; /* Màu xanh lá ForestGreen khi đang nói */
-    animation: pulse-speaker 1s infinite alternate; /* Hiệu ứng nhấp nháy */
+    color: #228B22;
+    animation: pulse-speaker 1s infinite alternate;
 }
 
 @keyframes pulse-speaker {
@@ -174,8 +177,8 @@ h1 {
 
 /* Optional: Add a subtle pulse for the message being spoken */
 .bot-message.speaking-active {
-    box-shadow: 0 0 8px rgba(160, 82, 45, 0.6); /* Màu nâu Sienna nhạt */
-    animation: none; /* Bỏ animation cũ nếu có */
+    box-shadow: 0 0 8px rgba(160, 82, 45, 0.6);
+    animation: none;
 }
 
 
@@ -185,25 +188,32 @@ h1 {
 /* Áp dụng cho màn hình có chiều rộng tối đa 768px (điện thoại và tablet nhỏ) */
 @media (max-width: 768px) {
     html, body {
-        /* Sử dụng 100vh để đảm bảo chiều cao cố định của viewport */
+        /* Đảm bảo html/body chiếm toàn bộ chiều cao viewport, nhưng không cần flex để căn giữa nữa */
         height: 100vh; 
-        min-height: 100vh; /* Đảm bảo không bị co lại */
-        display: flex; /* Dùng flexbox để căn giữa chat-container */
-        justify-content: center; /* Căn giữa theo chiều ngang */
-        align-items: center;   /* Căn giữa theo chiều dọc */
-        overflow: hidden; /* Ngăn cuộn trang tổng thể */
+        min-height: 100vh;
+        width: 100vw;
+        overflow: hidden; /* NGĂN CUỘN TRANG TỔNG THỂ */
+        display: block; /* Quan trọng: Loại bỏ flex trên body để chat-container có thể dùng absolute */
     }
 
     .chat-container {
+        /* Sử dụng position: absolute để đặt chính xác vị trí và kích thước */
+        position: absolute;
+        top: 50%; /* Đặt điểm neo ở giữa màn hình */
+        left: 50%;
+        transform: translate(-50%, -50%); /* Dịch chuyển ngược lại để căn giữa hoàn hảo */
+
         width: 95vw; /* Chiếm 95% chiều rộng viewport */
-        height: 75vh; /* ĐÂY LÀ ĐIỂM GIỚI HẠN CHÍNH: 75% CHIỀU CAO CỦA VIEWPORT */
+        height: 75vh; /* CHÍNH XÁC 75% CHIỀU CAO VIEWPORT */
+        
         max-width: none;
         max-height: none; /* Bỏ giới hạn max-height cứng */
-        border-radius: 8px; /* Giữ bo góc cho mobile, trông đẹp hơn */
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Giữ shadow cho mobile */
-        margin: auto; /* Căn giữa tự động trong không gian flex của body */
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        background: white; /* Đảm bảo nền trắng */
         display: flex;
         flex-direction: column;
+        overflow: hidden; /* Vẫn quan trọng để tin nhắn không tràn ra ngoài */
     }
 
     h1 {
@@ -216,11 +226,7 @@ h1 {
         padding: 8px;
         flex-grow: 1; /* Mở rộng tối đa không gian còn lại */
         overflow-y: auto; /* CUỘN CHỈ XẢY RA TRONG ĐÂY */
-        min-height: 0; /* Quan trọng cho flexbox để nó co lại đúng cách */
-        /* KHÔNG CẦN MAX-HEIGHT RÕ RÀNG Ở ĐÂY NỮA, VÌ CHAT-CONTAINER ĐÃ BỊ GIỚI HẠN */
-        /* NẾU VẪN MUỐN VÙNG TIN NHẮN NHỎ HƠN SAU KHI ĐẶT HEIGHT 75VH CHO CONTAINER, THÌ CÓ THỂ DÙNG */
-        /* max-height: calc(100% - var(--header-height) - var(--input-height)); */
-        /* Hoặc một giá trị % nhỏ hơn. */
+        min-height: 0; /* Quan trọng cho flexbox */
     }
 
     .chat-message {
@@ -242,8 +248,8 @@ h1 {
     }
 
     .chat-input button {
-        padding: 6px;
-        font-size: 1.1em;
+        padding: 5px;
+        font-size: 1em;
     }
 }
 
