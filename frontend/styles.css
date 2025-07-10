@@ -5,7 +5,7 @@ html, body {
     margin: 0;
     padding: 0;
     /* TRÊN DESKTOP: Đảm bảo chiếm toàn bộ chiều cao viewport */
-    height: 100vh; 
+    height: 100vh;
     width: 100vw;
     display: flex;
     justify-content: center;
@@ -185,87 +185,91 @@ h1 {
 /* Áp dụng cho màn hình có chiều rộng tối đa 768px (điện thoại và tablet nhỏ) */
 @media (max-width: 768px) {
     html, body {
-        /* RẤT QUAN TRỌNG: Sử dụng 100svh để đảm bảo chiều cao đúng trên di động */
-        /* svh tính toán đúng chiều cao khả dụng, bao gồm thanh địa chỉ trình duyệt, v.v. */
-        height: 100svh; 
-        min-height: 100svh; /* Đảm bảo không bị co lại dưới 100svh */
-        overflow: hidden; /* Vẫn NGĂN cuộn trang TỔNG THỂ */
+        /* Sử dụng position: fixed và 100% để force nó chiếm toàn bộ viewport */
+        position: fixed; /* Cố định vị trí */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0; /* Chiếm toàn bộ không gian khả dụng */
+        height: 100%; /* Đảm bảo nó tự điều chỉnh theo chiều cao viewport */
+        width: 100%;
+        overflow: hidden; /* NGĂN CUỘN TRANG CHÍNH */
     }
 
     .chat-container {
-        width: 100vw; /* Chiếm toàn bộ chiều rộng màn hình */
-        height: 100svh; /* Chiếm toàn bộ chiều cao khả dụng trên di động */
-        max-width: none; /* Bỏ giới hạn max-width */
-        max-height: none; /* Bỏ giới hạn max-height */
-        border-radius: 0; /* Loại bỏ bo góc để trông liền mạch với màn hình */
-        box-shadow: none; /* Loại bỏ shadow để trông liền mạch hơn */
-        margin: 0; /* Loại bỏ margin nếu có */
+        width: 100%; /* Chiếm toàn bộ chiều rộng của body (đã cố định) */
+        height: 100%; /* Chiếm toàn bộ chiều cao của body (đã cố định) */
+        max-width: none;
+        max-height: none;
+        border-radius: 0;
+        box-shadow: none;
+        margin: 0;
         display: flex;
-        flex-direction: column; /* Đảm bảo là flex column */
+        flex-direction: column;
     }
 
     h1 {
-        padding: 12px; 
-        font-size: 1.4em; 
-        flex-shrink: 0; /* Đảm bảo tiêu đề không bị co lại */
+        padding: 12px;
+        font-size: 1.4em;
+        flex-shrink: 0;
     }
 
     .chat-window {
-        padding: 8px; 
-        flex-grow: 1; /* Cho phép nó mở rộng tối đa không gian còn lại */
-        overflow-y: auto; /* Đảm bảo cuộn bên trong */
-        min-height: 0; /* Quan trọng để flex-grow hoạt động đúng */
-        /* Giới hạn chiều cao chat window trên di động */
-        /* calc(100% - ...) sẽ tính toán chiều cao còn lại của .chat-container */
-        /* sau khi trừ đi chiều cao của header và input */
-        /* Ví dụ: 50px cho h1, 50px cho chat-input (bạn cần tinh chỉnh số này) */
-        /* Dùng một giá trị cố định như 200px nếu muốn giới hạn hẳn. */
-        max-height: calc(100% - 50px - 60px); /* 50px (h1) + 60px (chat-input) là ước tính */
-                                              /* Hãy tinh chỉnh 50px và 60px bằng giá trị thực */
+        padding: 8px;
+        flex-grow: 1; /* Mở rộng tối đa không gian còn lại */
+        overflow-y: auto; /* CUỘN CHỈ XẢY RA TRONG ĐÂY */
+        min-height: 0; /* Quan trọng cho flexbox */
+        /* GIỚI HẠN CHIỀU CAO CHAT WINDOW TRÊN DI ĐỘNG */
+        /* Sử dụng calc() để trừ đi chiều cao thực tế của header và input. */
+        /* Giả sử: header ~48px, input ~58px (bao gồm padding, margin) */
+        /* Tổng cộng khoảng 106px. Vậy (100% - 106px) là phần còn lại */
+        /* Lấy 75% của phần còn lại đó, hoặc đơn giản hơn là 75% của 100% chiều cao cha. */
+        max-height: 75%; /* Tối đa 75% chiều cao của .chat-container. */
+                         /* Bạn có thể thử 70%, 65% nếu thấy vẫn còn quá lớn. */
     }
 
     .chat-message {
-        padding: 10px 14px; 
-        margin: 5px 0; 
-        max-width: 90%; 
-        font-size: 0.95em; 
+        padding: 10px 14px;
+        margin: 5px 0;
+        max-width: 90%;
+        font-size: 0.95em;
     }
 
     .chat-input {
-        padding: 6px; 
-        flex-shrink: 0; /* Đảm bảo khu vực input không bị co lại */
+        padding: 6px;
+        flex-shrink: 0;
     }
 
     .chat-input input {
-        padding: 10px 12px; 
-        font-size: 0.9em; 
-        margin-right: 5px; 
+        padding: 10px 12px;
+        font-size: 0.9em;
+        margin-right: 5px;
     }
 
     .chat-input button {
-        padding: 6px; 
-        font-size: 1.1em; 
+        padding: 6px;
+        font-size: 1.1em;
     }
 }
 
 /* Áp dụng cho màn hình có chiều rộng tối đa 480px (điện thoại cỡ nhỏ) */
 @media (max-width: 480px) {
     h1 {
-        font-size: 1.2em; 
+        font-size: 1.2em;
     }
 
     .chat-message {
-        padding: 8px 12px; 
-        font-size: 0.9em; 
+        padding: 8px 12px;
+        font-size: 0.9em;
     }
 
     .chat-input input {
-        padding: 8px 10px; 
-        font-size: 0.85em; 
+        padding: 8px 10px;
+        font-size: 0.85em;
     }
 
     .chat-input button {
-        padding: 5px; 
-        font-size: 1em; 
+        padding: 5px;
+        font-size: 1em;
     }
 }
