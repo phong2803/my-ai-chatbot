@@ -3,9 +3,9 @@
 const BACKEND_URL = 'https://my-ai-chatbot-utz9.onrender.com';
 
 // Lấy các phần tử DOM
-// === ĐÃ SỬA LỖI MIC: Đổi 'message' thành 'message' (giữ nguyên) vì HTML cũ dùng 'message' ===
-const userInput = document.getElementById('message'); // GIỮ NGUYÊN 'message' ĐỂ KHỚP VỚI HTML CŨ CỦA BẠN
-const sendButton = document.getElementById('send-button'); // Đảm bảo nút gửi hoạt động
+// === ĐÃ SỬA LỖI MIC: Đổi 'message' thành 'user-input' để khớp với HTML đã sửa ===
+const userInput = document.getElementById('user-input'); 
+const sendButton = document.getElementById('send-button');
 const micButton = document.getElementById('mic-button');
 const speakerButton = document.getElementById('speaker-button');
 const chatWindow = document.getElementById('chat-window');
