@@ -185,27 +185,25 @@ h1 {
 /* Áp dụng cho màn hình có chiều rộng tối đa 768px (điện thoại và tablet nhỏ) */
 @media (max-width: 768px) {
     html, body {
-        /* Đảm bảo html/body chiếm toàn bộ chiều cao viewport và cho phép flexbox hoạt động */
-        height: 100svh; /* Hoặc 100vh nếu svh vẫn gây vấn đề */
-        min-height: 100svh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        /* Sử dụng 100vh để đảm bảo chiều cao cố định của viewport */
+        height: 100vh; 
+        min-height: 100vh; /* Đảm bảo không bị co lại */
+        display: flex; /* Dùng flexbox để căn giữa chat-container */
+        justify-content: center; /* Căn giữa theo chiều ngang */
+        align-items: center;   /* Căn giữa theo chiều dọc */
         overflow: hidden; /* Ngăn cuộn trang tổng thể */
     }
 
     .chat-container {
         width: 95vw; /* Chiếm 95% chiều rộng viewport */
-        height: 75svh; /* GIỚI HẠN CHÍNH Ở ĐÂY: CHỈ CHIẾM 75% CHIỀU CAO VIEWPORT */
+        height: 75vh; /* ĐÂY LÀ ĐIỂM GIỚI HẠN CHÍNH: 75% CHIỀU CAO CỦA VIEWPORT */
         max-width: none;
         max-height: none; /* Bỏ giới hạn max-height cứng */
         border-radius: 8px; /* Giữ bo góc cho mobile, trông đẹp hơn */
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Giữ shadow cho mobile */
-        margin: auto; /* Căn giữa tự động nếu có không gian */
+        margin: auto; /* Căn giữa tự động trong không gian flex của body */
         display: flex;
         flex-direction: column;
-        /* Thêm thuộc tính này để đảm bảo flexbox hoạt động đúng bên trong */
-        flex-basis: auto; 
     }
 
     h1 {
@@ -220,7 +218,9 @@ h1 {
         overflow-y: auto; /* CUỘN CHỈ XẢY RA TRONG ĐÂY */
         min-height: 0; /* Quan trọng cho flexbox để nó co lại đúng cách */
         /* KHÔNG CẦN MAX-HEIGHT RÕ RÀNG Ở ĐÂY NỮA, VÌ CHAT-CONTAINER ĐÃ BỊ GIỚI HẠN */
-        /* NẾU VẪN MUỐN GIỚI HẠN NHỎ HƠN TRONG CHAT WINDOW, HÃY DÙNG calc() TRỪ ĐI HEADER/INPUT */
+        /* NẾU VẪN MUỐN VÙNG TIN NHẮN NHỎ HƠN SAU KHI ĐẶT HEIGHT 75VH CHO CONTAINER, THÌ CÓ THỂ DÙNG */
+        /* max-height: calc(100% - var(--header-height) - var(--input-height)); */
+        /* Hoặc một giá trị % nhỏ hơn. */
     }
 
     .chat-message {
