@@ -10,7 +10,7 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* NGĂN cuộn trang TỔNG THỂ */
+    overflow: hidden; /* NGĂN cuộn trang TỔNG THỂ trên desktop */
 }
 
 /* Chat container styling */
@@ -185,27 +185,27 @@ h1 {
 /* Áp dụng cho màn hình có chiều rộng tối đa 768px (điện thoại và tablet nhỏ) */
 @media (max-width: 768px) {
     html, body {
-        /* Sử dụng position: fixed và 100% để force nó chiếm toàn bộ viewport */
-        position: fixed; /* Cố định vị trí */
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0; /* Chiếm toàn bộ không gian khả dụng */
-        height: 100%; /* Đảm bảo nó tự điều chỉnh theo chiều cao viewport */
-        width: 100%;
-        overflow: hidden; /* NGĂN CUỘN TRANG CHÍNH */
+        /* Đảm bảo html/body chiếm toàn bộ chiều cao viewport và cho phép flexbox hoạt động */
+        height: 100svh; /* Hoặc 100vh nếu svh vẫn gây vấn đề */
+        min-height: 100svh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden; /* Ngăn cuộn trang tổng thể */
     }
 
     .chat-container {
-        width: 100%; /* Chiếm toàn bộ chiều rộng của body (đã cố định) */
-        height: 100%; /* Chiếm toàn bộ chiều cao của body (đã cố định) */
+        width: 95vw; /* Chiếm 95% chiều rộng viewport */
+        height: 75svh; /* GIỚI HẠN CHÍNH Ở ĐÂY: CHỈ CHIẾM 75% CHIỀU CAO VIEWPORT */
         max-width: none;
-        max-height: none;
-        border-radius: 0;
-        box-shadow: none;
-        margin: 0;
+        max-height: none; /* Bỏ giới hạn max-height cứng */
+        border-radius: 8px; /* Giữ bo góc cho mobile, trông đẹp hơn */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Giữ shadow cho mobile */
+        margin: auto; /* Căn giữa tự động nếu có không gian */
         display: flex;
         flex-direction: column;
+        /* Thêm thuộc tính này để đảm bảo flexbox hoạt động đúng bên trong */
+        flex-basis: auto; 
     }
 
     h1 {
@@ -218,14 +218,9 @@ h1 {
         padding: 8px;
         flex-grow: 1; /* Mở rộng tối đa không gian còn lại */
         overflow-y: auto; /* CUỘN CHỈ XẢY RA TRONG ĐÂY */
-        min-height: 0; /* Quan trọng cho flexbox */
-        /* GIỚI HẠN CHIỀU CAO CHAT WINDOW TRÊN DI ĐỘNG */
-        /* Sử dụng calc() để trừ đi chiều cao thực tế của header và input. */
-        /* Giả sử: header ~48px, input ~58px (bao gồm padding, margin) */
-        /* Tổng cộng khoảng 106px. Vậy (100% - 106px) là phần còn lại */
-        /* Lấy 75% của phần còn lại đó, hoặc đơn giản hơn là 75% của 100% chiều cao cha. */
-        max-height: 75%; /* Tối đa 75% chiều cao của .chat-container. */
-                         /* Bạn có thể thử 70%, 65% nếu thấy vẫn còn quá lớn. */
+        min-height: 0; /* Quan trọng cho flexbox để nó co lại đúng cách */
+        /* KHÔNG CẦN MAX-HEIGHT RÕ RÀNG Ở ĐÂY NỮA, VÌ CHAT-CONTAINER ĐÃ BỊ GIỚI HẠN */
+        /* NẾU VẪN MUỐN GIỚI HẠN NHỎ HƠN TRONG CHAT WINDOW, HÃY DÙNG calc() TRỪ ĐI HEADER/INPUT */
     }
 
     .chat-message {
