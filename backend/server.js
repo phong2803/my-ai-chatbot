@@ -125,10 +125,13 @@ app.post('/stt', upload.single('audio'), async (req, res) => { // Dùng upload.s
         const formData = new FormData(); // KHÔNG Dùng new Blob() ở đây nữa
 
         // Append file với tên 'file' (OpenAI yêu cầu), buffer và thông tin file gốc
-        formData.append('file', audioBuffer, {
-            filename: req.file.originalname, // Tên file gốc từ client
-            contentType: req.file.mimetype // Loại MIME của file (ví dụ: 'audio/webm')
-        });
+        // Đảm bảo mimetype là 'audio/webm' hoặc lấy từ req.file.mimetype nếu chắc chắn đúng
+        const fileMimeType = req.file.mimetype || 'audio/webm';
+
+        formData.append('file', audioBuffer, {
+            filename: `audio_recording.webm`, // ✅ THAY ĐỔI Ở ĐÂY: Đặt tên file rõ ràng với đuôi .webm
+            contentType: fileMimeType // Lấy mimetype từ req.file hoặc dùng mặc định
+        });
         formData.append('model', 'whisper-1');
         formData.append('language', 'vi'); // Rất quan trọng để chỉ định ngôn ngữ là tiếng Việt
 
