@@ -3,7 +3,8 @@
 const BACKEND_URL = 'https://my-ai-chatbot-utz9.onrender.com';
 
 // Lấy các phần tử DOM
-const userInput = document.getElementById('message');
+// === ĐÃ SỬA: Đổi 'message' thành 'user-input' ===
+const userInput = document.getElementById('user-input'); 
 const sendButton = document.getElementById('send-button');
 const micButton = document.getElementById('mic-button');
 const speakerButton = document.getElementById('speaker-button');
@@ -240,7 +241,7 @@ async function sendMessage() {
     botMessageDiv.classList.add('chat-message', 'bot-message');
     botMessageDiv.innerText = '...';
     chatWindow.appendChild(botMessageDiv);
-    chatWindow.scrollTop = chatWindow.ConvscrollY;
+    chatWindow.scrollTop = chatWindow.scrollHeight; // Đảm bảo cuộn xuống cuối sau khi thêm placeholder
 
     // Khi có tin nhắn mới, dừng nếu đang phát âm thanh cũ
     if (isSpeaking && currentAudio) {
@@ -286,6 +287,7 @@ userInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') sendMessage();
 });
 
+sendButton.addEventListener('click', sendMessage); // THÊM NÚT SEND
 micButton.addEventListener('click', startSpeechToText); // Nút mic chỉ dùng để BẮT ĐẦU ghi âm
 
 // === THÊM EVENT LISTENER CHO CÁC NÚT MỚI ===
