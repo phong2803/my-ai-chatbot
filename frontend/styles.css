@@ -4,7 +4,8 @@ html, body {
     background-color: #F5DEB3; /* Nền trang màu nâu nhạt */
     margin: 0;
     padding: 0;
-    height: 100vh;
+    /* Dùng height: 100vh để luôn chiếm toàn bộ chiều cao của viewport hiện tại trên desktop */
+    height: 100vh; 
     width: 100vw;
     display: flex;
     justify-content: center;
@@ -21,7 +22,7 @@ html, body {
     background: white; /* Giữ nền trắng cho container chính */
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* Shadow nổi bật hơn */
-    overflow: hidden;
+    overflow: hidden; /* Quan trọng để cuộn chỉ xảy ra bên trong chat-window */
     display: flex;
     flex-direction: column;
 }
@@ -30,7 +31,7 @@ html, body {
 h1 {
     background: #A0522D; /* Màu nâu Sienna cho header */
     color: white;
-    padding: 15px; /* Quay lại padding ban đầu */
+    padding: 8px; /* ✅ ĐIỀU CHỈNH: Giảm padding để gọn hơn trên desktop */
     text-align: center;
     margin: 0;
     font-size: 1.8em;
@@ -39,9 +40,9 @@ h1 {
 
 /* Chat window styling */
 .chat-window {
-    padding: 15px; /* Quay lại padding ban đầu */
+    padding: 8px; /* ✅ ĐIỀU CHỈNH: Giảm padding để gọn hơn trên desktop */
     flex-grow: 1; /* Cho phép nó mở rộng hết không gian còn lại */
-    overflow-y: auto;
+    overflow-y: auto; /* Thanh cuộn chỉ xuất hiện bên trong khu vực tin nhắn */
     border-bottom: 1px solid #eee;
     display: flex;
     flex-direction: column;
@@ -50,50 +51,50 @@ h1 {
 
 /* Message bubble styling */
 .chat-message {
-    padding: 12px 18px; /* Tăng padding bong bóng */
-    margin: 8px 0; /* Giảm margin một chút */
+    padding: 10px 14px; /* Giảm padding bong bóng để gọn hơn */
+    margin: 6px 0; /* Giảm margin giữa các tin nhắn */
     border-radius: 20px;
-    max-width: 80%; /* Tăng max-width để tin nhắn dài hơn trên màn hình rộng */
+    max-width: 80%;
     word-wrap: break-word;
     display: inline-block;
-    line-height: 1.4; /* Tăng khoảng cách dòng */
+    line-height: 1.4;
 }
 
 /* Bot message styling */
 .bot-message {
     background: #CD853F; /* Màu nâu Peru cho tin nhắn của bot */
-    color: white; /* Đổi màu chữ sang trắng để dễ đọc trên nền nâu */
+    color: white;
     align-self: flex-start;
-    border-radius: 20px 20px 20px 5px; /* Bo tròn góc dưới trái ít hơn */
+    border-radius: 20px 20px 20px 5px;
 }
 
 /* User message styling */
 .user-message {
     background: #8B4513; /* Màu nâu SaddleBrown cho tin nhắn của người dùng */
-    color: white; /* Giữ màu chữ trắng */
+    color: white;
     align-self: flex-end;
-    border-radius: 20px 20px 5px 20px; /* Bo tròn góc dưới phải ít hơn */
+    border-radius: 20px 20px 5px 20px;
 }
 
 /* Input area styling */
 .chat-input {
     display: flex;
     border-top: 1px solid #eee;
-    padding: 10px; /* Quay lại padding ban đầu */
+    padding: 6px; /* ✅ ĐIỀU CHỈNH: Giảm padding để gọn hơn trên desktop */
     align-items: center;
-    background-color: white; /* Đảm bảo nền trắng */
+    background-color: white;
     min-height: 50px; /* Đảm bảo khu vực input có chiều cao tối thiểu */
 }
 
 /* Input field styling */
 .chat-input input {
     flex-grow: 1;
-    padding: 12px 15px; /* Tăng padding input */
-    border: 1px solid #ddd; /* Thêm border cho input */
-    border-radius: 25px; /* Bo tròn nhiều hơn */
+    padding: 10px 12px; /* Giảm padding input */
+    border: 1px solid #ddd;
+    border-radius: 25px;
     outline: none;
-    background: #f9f9f9; /* Nền nhạt hơn */
-    margin-right: 10px;
+    background: #f9f9f9;
+    margin-right: 8px; /* Giảm margin */
     font-size: 1em;
 }
 
@@ -107,18 +108,18 @@ h1 {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 10px;
-    color: #A0522D; /* Màu nâu Sienna cho icon */
-    font-size: 1.4em; /* Tăng kích thước icon */
+    padding: 8px; /* Giảm padding button */
+    color: #A0522D;
+    font-size: 1.3em; /* Giảm kích thước icon một chút */
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.3s ease, transform 0.2s ease; /* Thêm hiệu ứng transform */
+    transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .chat-input button:hover {
-    color: #D2691E; /* Màu nâu Chocolate khi hover */
-    transform: translateY(-2px); /* Nhấc nhẹ nút lên khi hover */
+    color: #D2691E;
+    transform: translateY(-2px);
 }
 
 .chat-input button:focus {
@@ -127,69 +128,48 @@ h1 {
 
 /* Specific styling for mic button */
 .chat-input button#mic-button {
-    margin-right: 5px;
+    margin-right: 4px;
 }
 
 /* Specific styling for speaker button */
 .chat-input button#speaker-button {
-    margin-right: 5px;
+    margin-right: 4px;
 }
 
 /* Style for when recording is active (mic button) */
 .chat-input button#mic-button.recording {
-    color: #B22222; /* Màu đỏ BrickRed để chỉ trạng thái ghi âm */
-    animation: pulse-mic 1s infinite alternate; /* Hiệu ứng nhấp nháy */
+    color: #B22222;
+    animation: pulse-mic 1s infinite alternate;
 }
 
 @keyframes pulse-mic {
-    from {
-        transform: scale(1);
-        opacity: 1;
-    }
-    to {
-        transform: scale(1.1);
-        opacity: 0.7;
-    }
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(1.1); opacity: 0.7; }
 }
 
 /* Style for when speaking is active (speaker button) */
 #speaker-button.speaking {
-    color: #228B22; /* Màu xanh lá ForestGreen khi đang nói */
-    animation: pulse-speaker 1s infinite alternate; /* Hiệu ứng nhấp nháy */
+    color: #228B22;
+    animation: pulse-speaker 1s infinite alternate;
 }
 
 @keyframes pulse-speaker {
-    from {
-        transform: scale(1);
-        opacity: 1;
-    }
-    to {
-        transform: scale(1.1);
-        opacity: 0.7;
-    }
+    from { transform: scale(1); opacity: 1; }
+    to { transform: scale(1.1); opacity: 0.7; }
 }
 
 /* Optional: Add a subtle pulse for the message being spoken */
 .bot-message.speaking-active {
-    background: #CD853F; /* Màu nâu Peru cho tin nhắn của bot */
-    color: white; /* Đổi màu chữ sang trắng để dễ đọc trên nền nâu */
-    animation: speech-pulse 1.2s infinite alternate ease-in-out; /* Hiệu ứng nhẹ nhàng */
-    box-shadow: 0 0 10px rgba(205, 133, 63, 0.8); /* Bóng đổ nổi bật hơn khi nói */
+    background: #CD853F;
+    color: white;
+    animation: speech-pulse 1.2s infinite alternate ease-in-out;
+    box-shadow: 0 0 10px rgba(205, 133, 63, 0.8);
 }
 
 @keyframes speech-pulse {
-    0% {
-        transform: scale(1);
-        box-shadow: 0 0 10px rgba(205, 133, 63, 0.8);
-    }
-    50% {
-        transform: scale(1.01); /* Nhấc nhẹ lên một chút */
-        box-shadow: 0 0 15px rgba(205, 133, 63, 1); /* Bóng rõ hơn */
-    }
-    100% {
-        transform: scale(1);
-        box-shadow: 0 0 10px rgba(205, 133, 63, 0.8);
-    }
+    0% { transform: scale(1); box-shadow: 0 0 10px rgba(205, 133, 63, 0.8); }
+    50% { transform: scale(1.01); box-shadow: 0 0 15px rgba(205, 133, 63, 1); }
+    100% { transform: scale(1); box-shadow: 0 0 10px rgba(205, 133, 63, 0.8); }
 }
 
 ---
@@ -200,80 +180,83 @@ h1 {
     html, body {
         margin: 0;
         padding: 0;
-        /* Rất quan trọng: Cho phép cuộn trang nếu nội dung vượt quá (ví dụ: bàn phím ảo xuất hiện) */
-        overflow: auto; /* Đổi từ hidden sang auto để cho phép cuộn */
+        /* RẤT QUAN TRỌNG:
+           1. height: 100vh; để chiếm toàn bộ viewport.
+           2. overflow: hidden; để ngăn cuộn trang.
+           3. Dùng min-height: -webkit-fill-available; cho body để khắc phục vấn đề thanh địa chỉ trên iOS Safari.
+           Đây là một giải pháp hack cho Safari, nơi 100vh không luôn tính đúng.
+        */
+        height: 100vh; /* Quan trọng để chatbot có thể chiếm toàn màn hình */
+        min-height: -webkit-fill-available; /* ✅ THÊM: Hỗ trợ Safari iOS để full màn hình thật sự */
+        overflow: hidden; /* ✅ ĐIỀU CHỈNH: Ngăn cuộn trang để tất cả nằm trong 1 màn hình */
     }
 
     .chat-container {
-        /* Quay về chiều cao ban đầu cho mobile, để tránh bị che input */
-        width: 95vw;
-        height: 90vh; /* ✅ ĐIỀU CHỈNH: Chiều cao chatbot trên mobile quay về 90vh */
-        
+        /* Chiếm toàn bộ màn hình trên mobile */
+        width: 100vw; /* ✅ ĐIỀU CHỈNH: Chiếm 100% chiều rộng viewport */
+        height: 100vh; /* ✅ ĐIỀU CHỈNH: Chiếm 100% chiều cao viewport */
         max-width: none;
         max-height: none;
-        border-radius: 8px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        margin: auto;
+        border-radius: 0; /* ✅ ĐIỀU CHỈNH: Bỏ bo góc để hòa vào màn hình */
+        box-shadow: none; /* ✅ ĐIỀU CHỈNH: Bỏ shadow để hòa vào màn hình */
+        margin: 0; /* ✅ ĐIỀU CHỈNH: Bỏ margin để chiếm trọn */
     }
 
-    /* Giữ các điều chỉnh padding và font-size khác cho di động */
+    /* Giảm padding và font-size cho di động để gọn hơn nữa */
     h1 {
-        padding: 12px; /* Quay về padding ban đầu cho mobile */
-        font-size: 1.4em;
+        padding: 6px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho mobile */
+        font-size: 1.3em; /* Giảm kích thước chữ tiêu đề */
     }
 
     .chat-window {
-        padding: 8px; /* Quay về padding ban đầu cho mobile */
-        /* Đảm bảo chat window có thể co lại để nhường chỗ cho input */
+        padding: 4px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho mobile */
         flex-shrink: 1; /* Cho phép co lại */
-        min-height: 100px; /* Đặt chiều cao tối thiểu cho khu vực tin nhắn */
+        min-height: 80px; /* Đặt chiều cao tối thiểu cho khu vực tin nhắn, có thể thấp hơn */
     }
 
     .chat-message {
-        padding: 10px 14px;
-        margin: 5px 0;
-        max-width: 90%;
-        font-size: 0.95em;
+        padding: 8px 12px; /* Giảm padding bong bóng cho mobile */
+        margin: 4px 0; /* Giảm margin giữa các tin nhắn cho mobile */
+        max-width: 95%; /* Cho phép tin nhắn rộng hơn một chút */
+        font-size: 0.9em; /* Giảm kích thước chữ tin nhắn */
     }
 
     .chat-input {
-        padding: 6px; /* Quay về padding ban đầu cho mobile */
-        /* Đảm bảo khu vực input luôn hiển thị và không bị ẩn */
-        flex-shrink: 0; /* Ngăn khu vực input co lại */
+        padding: 4px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho mobile */
+        flex-shrink: 0; /* NGĂN KHU VỰC INPUT CO LẠI, RẤT QUAN TRỌNG */
     }
 
     .chat-input input {
-        flex-grow: 1;
-        padding: 10px 12px;
-        font-size: 0.9em;
-        margin-right: 5px;
+        padding: 8px 10px; /* Giảm padding input cho mobile */
+        font-size: 0.85em;
+        margin-right: 4px;
     }
 
     .chat-input button {
-        padding: 6px;
-        font-size: 1.1em;
+        padding: 5px; /* Giảm padding button cho mobile */
+        font-size: 1em;
     }
 }
 
 /* Áp dụng cho màn hình có chiều rộng tối đa 480px (điện thoại cỡ nhỏ) */
 @media (max-width: 480px) {
     h1 {
-        font-size: 1.2em;
-        padding: 10px; /* Quay về padding ban đầu cho điện thoại cỡ nhỏ */
+        font-size: 1.1em;
+        padding: 5px;
     }
 
     .chat-message {
-        padding: 8px 12px;
-        font-size: 0.9em;
-    }
-
-    .chat-input input {
-        padding: 8px 10px;
+        padding: 6px 10px;
         font-size: 0.85em;
     }
 
+    .chat-input input {
+        padding: 7px 9px;
+        font-size: 0.8em;
+    }
+
     .chat-input button {
-        padding: 5px;
-        font-size: 1em;
+        padding: 4px;
+        font-size: 0.9em;
     }
 }
