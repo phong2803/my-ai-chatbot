@@ -4,9 +4,8 @@ html, body {
     background-color: #F5DEB3; /* Nền trang màu nâu nhạt */
     margin: 0;
     padding: 0;
-    /* RẤT QUAN TRỌNG: Dùng height: 100vh để luôn chiếm toàn bộ chiều cao của viewport hiện tại */
     height: 100vh;
-    width: 100vw;   /* Đảm bảo chiếm toàn bộ chiều rộng viewport */
+    width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -31,7 +30,7 @@ html, body {
 h1 {
     background: #A0522D; /* Màu nâu Sienna cho header */
     color: white;
-    padding: 10px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho desktop */
+    padding: 15px; /* Quay lại padding ban đầu */
     text-align: center;
     margin: 0;
     font-size: 1.8em;
@@ -40,7 +39,7 @@ h1 {
 
 /* Chat window styling */
 .chat-window {
-    padding: 10px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho desktop */
+    padding: 15px; /* Quay lại padding ban đầu */
     flex-grow: 1; /* Cho phép nó mở rộng hết không gian còn lại */
     overflow-y: auto;
     border-bottom: 1px solid #eee;
@@ -80,9 +79,10 @@ h1 {
 .chat-input {
     display: flex;
     border-top: 1px solid #eee;
-    padding: 8px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho desktop */
+    padding: 10px; /* Quay lại padding ban đầu */
     align-items: center;
     background-color: white; /* Đảm bảo nền trắng */
+    min-height: 50px; /* Đảm bảo khu vực input có chiều cao tối thiểu */
 }
 
 /* Input field styling */
@@ -201,29 +201,32 @@ h1 {
         margin: 0;
         padding: 0;
         /* Rất quan trọng: Cho phép cuộn trang nếu nội dung vượt quá (ví dụ: bàn phím ảo xuất hiện) */
-        overflow: auto; /* ✅ Đổi từ hidden sang auto để cho phép cuộn */
+        overflow: auto; /* Đổi từ hidden sang auto để cho phép cuộn */
     }
 
     .chat-container {
-        /* ĐIỀU CHỈNH: Không còn 100vw/100vh nữa, thu nhỏ lại một chút */
-        width: 95vw;   /* Chiếm 95% chiều rộng viewport */
-        height: 75vh;  /* ✅ ĐÃ ĐIỀU CHỈNH: Chiều cao chatbot trên mobile */
+        /* Quay về chiều cao ban đầu cho mobile, để tránh bị che input */
+        width: 95vw;
+        height: 90vh; /* ✅ ĐIỀU CHỈNH: Chiều cao chatbot trên mobile quay về 90vh */
         
-        max-width: none; /* Bỏ giới hạn max-width trên di động */
-        max-height: none; /* Bỏ giới hạn max-height trên di động */
-        border-radius: 8px; /* TRẢ LẠI: Giữ bo góc cho mobile để trông như một cửa sổ */
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15); /* TRẢ LẠI: Giữ shadow cho mobile */
-        margin: auto; /* THÊM: Căn giữa container trên mobile */
+        max-width: none;
+        max-height: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        margin: auto;
     }
 
     /* Giữ các điều chỉnh padding và font-size khác cho di động */
     h1 {
-        padding: 8px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho mobile */
+        padding: 12px; /* Quay về padding ban đầu cho mobile */
         font-size: 1.4em;
     }
 
     .chat-window {
-        padding: 5px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho mobile */
+        padding: 8px; /* Quay về padding ban đầu cho mobile */
+        /* Đảm bảo chat window có thể co lại để nhường chỗ cho input */
+        flex-shrink: 1; /* Cho phép co lại */
+        min-height: 100px; /* Đặt chiều cao tối thiểu cho khu vực tin nhắn */
     }
 
     .chat-message {
@@ -234,7 +237,9 @@ h1 {
     }
 
     .chat-input {
-        padding: 5px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho mobile */
+        padding: 6px; /* Quay về padding ban đầu cho mobile */
+        /* Đảm bảo khu vực input luôn hiển thị và không bị ẩn */
+        flex-shrink: 0; /* Ngăn khu vực input co lại */
     }
 
     .chat-input input {
@@ -254,7 +259,7 @@ h1 {
 @media (max-width: 480px) {
     h1 {
         font-size: 1.2em;
-        padding: 6px; /* ✅ ĐIỀU CHỈNH: Giảm padding cho điện thoại cỡ nhỏ */
+        padding: 10px; /* Quay về padding ban đầu cho điện thoại cỡ nhỏ */
     }
 
     .chat-message {
@@ -269,6 +274,6 @@ h1 {
 
     .chat-input button {
         padding: 5px;
-        font-size: 1em; /* ✅ ĐÃ HOÀN THIỆN: Khắc phục lỗi thiếu giá trị */
+        font-size: 1em;
     }
 }
