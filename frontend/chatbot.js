@@ -222,7 +222,7 @@ async function startSpeechToText() {
 }
 
 
-// Hàm gửi tin nhắn (gọi đến backend) - Đã được chỉnh sửa để có ngữ cảnh
+// Hàm gửi tin nhắn (gọi đến backend) - Đã được chỉnh sửa để có ngữ cảnh và xử lý ảnh
 async function sendMessage() {
     const message = userInput.value.trim();
     if (message === '') return;
@@ -239,9 +239,9 @@ async function sendMessage() {
     // Hiển thị placeholder cho tin nhắn bot
     const botMessageDiv = document.createElement('div');
     botMessageDiv.classList.add('chat-message', 'bot-message');
-    botMessageDiv.innerText = '...';
+    botMessageDiv.innerHTML = '<span class="loading-dots">...</span>';
     chatWindow.appendChild(botMessageDiv);
-    chatWindow.scrollTop = chatWindow.scrollHeight; // Đảm bảo cuộn xuống cuối sau khi thêm placeholder
+    chatWindow.scrollTop = chatWindow.scrollHeight;
 
     // Khi có tin nhắn mới, dừng nếu đang phát âm thanh cũ
     if (isSpeaking && currentAudio) {
@@ -263,24 +263,57 @@ async function sendMessage() {
             body: JSON.stringify({ messages: conversationHistory })
         });
 
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
-        const botMessage = data.botMessage;
+        let botMessageContent = data.botMessage;
 
-        botMessageDiv.innerText = botMessage;
-        conversationHistory.push({ role: 'assistant', content: botMessage });
+        // --- BẮT ĐẦU LOGIC XỬ LÝ MARKDOWN HÌNH ẢNH ---
+        const markdownImageRegex = /!\[(.*?)\]\((.*?)\)/g;
+        let match;
+        let imageUrlFromMarkdown = null;
+        let cleanedBotMessage = botMessageContent;
 
-        // --- KHÔNG CÒN GỌI speakText(botMessage) TỰ ĐỘNG Ở ĐÂY NỮA ---
-        // Giờ đây người dùng sẽ ấn nút loa để nói
+        while ((match = markdownImageRegex.exec(botMessageContent)) !== null) {
+            const altText = match[1];
+            const imageUrl = match[2];
+            imageUrlFromMarkdown = imageUrl;
+            cleanedBotMessage = cleanedBotMessage.replace(match[0], '').trim();
+        }
+
+        // Cập nhật nội dung tin nhắn bot
+        botMessageDiv.innerText = cleanedBotMessage;
+        conversationHistory.push({ role: 'assistant', content: cleanedBotMessage });
+
+        // --- HIỂN THỊ ẢNH NẾU CÓ ---
+        if (imageUrlFromMarkdown) {
+            const imageDiv = document.createElement('div');
+            imageDiv.classList.add('chat-message', 'bot-message', 'image-message');
+            
+            const imgElement = document.createElement('img');
+            imgElement.src = imageUrlFromMarkdown;
+            imgElement.alt = "Hình ảnh";
+            imgElement.style.maxWidth = '100%';
+            imgElement.style.height = 'auto';
+            imgElement.style.marginTop = '10px';
+
+            imageDiv.appendChild(imgElement);
+            chatWindow.appendChild(imageDiv);
+        }
+        // --- KẾT THÚC LOGIC XỬ LÝ ẢNH ---
+
+        chatWindow.scrollTop = chatWindow.scrollHeight;
 
     } catch (error) {
-        console.error('Error sending message:', error);
-        botMessageDiv.innerText = 'Sorry, an error occurred.';
+        console.error('Lỗi gửi tin nhắn:', error);
+        botMessageDiv.innerText = 'Xin lỗi, đã xảy ra lỗi khi xử lý yêu cầu của bạn.';
         if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === 'user') {
-            conversationHistory.pop(); // Xóa tin nhắn người dùng nếu lỗi để không làm sai lịch sử
+            conversationHistory.pop();
         }
     }
 }
-
 
 // Event listener cho nút Enter và các nút hành động
 userInput.addEventListener('keypress', (e) => {
